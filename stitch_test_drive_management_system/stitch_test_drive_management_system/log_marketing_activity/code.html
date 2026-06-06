@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FleetDrive Pro - Create Marketing Campaign</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=Hanken+Grotesk:wght@600;700&amp;family=JetBrains+Mono:wght@450&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary": "#0051d5",
+                    "inverse-primary": "#bec6e0",
+                    "on-primary-fixed": "#131b2e",
+                    "tertiary": "#000000",
+                    "secondary-fixed": "#dbe1ff",
+                    "secondary-fixed-dim": "#b4c5ff",
+                    "on-error-container": "#93000a",
+                    "on-tertiary-fixed": "#0b1c30",
+                    "primary": "#000000",
+                    "on-tertiary-fixed-variant": "#38485d",
+                    "on-secondary-container": "#fefcff",
+                    "surface-container-high": "#e6e8ea",
+                    "inverse-surface": "#2d3133",
+                    "on-secondary-fixed": "#00174b",
+                    "surface-tint": "#565e74",
+                    "on-tertiary-container": "#75859d",
+                    "tertiary-container": "#0b1c30",
+                    "on-surface-variant": "#45464d",
+                    "on-primary-container": "#7c839b",
+                    "inverse-on-surface": "#eff1f3",
+                    "error-container": "#ffdad6",
+                    "tertiary-fixed": "#d3e4fe",
+                    "surface-variant": "#e0e3e5",
+                    "primary-fixed": "#dae2fd",
+                    "on-background": "#191c1e",
+                    "surface-container": "#eceef0",
+                    "surface-container-highest": "#e0e3e5",
+                    "on-secondary": "#ffffff",
+                    "on-primary-fixed-variant": "#3f465c",
+                    "on-tertiary": "#ffffff",
+                    "secondary-container": "#316bf3",
+                    "outline": "#76777d",
+                    "tertiary-fixed-dim": "#b7c8e1",
+                    "surface-bright": "#f7f9fb",
+                    "error": "#ba1a1a",
+                    "primary-container": "#131b2e",
+                    "on-error": "#ffffff",
+                    "surface": "#f7f9fb",
+                    "background": "#f7f9fb",
+                    "primary-fixed-dim": "#bec6e0",
+                    "surface-container-low": "#f2f4f6",
+                    "on-surface": "#191c1e",
+                    "on-primary": "#ffffff",
+                    "surface-dim": "#d8dadc",
+                    "surface-container-lowest": "#ffffff",
+                    "outline-variant": "#c6c6cd",
+                    "on-secondary-fixed-variant": "#003ea8"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "row-height-standard": "48px",
+                    "row-height-dense": "32px",
+                    "stack-gap": "12px",
+                    "unit": "4px",
+                    "gutter": "16px",
+                    "container-padding": "24px"
+            },
+            "fontFamily": {
+                    "label-caps": ["Inter"],
+                    "body-md": ["Inter"],
+                    "table-data": ["Inter"],
+                    "mono-data": ["JetBrains Mono"],
+                    "title-sm": ["Inter"],
+                    "headline-md": ["Hanken Grotesk"],
+                    "display-lg": ["Hanken Grotesk"],
+                    "body-sm": ["Inter"]
+            },
+            "fontSize": {
+                    "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "table-data": ["13px", {"lineHeight": "16px", "fontWeight": "400"}],
+                    "mono-data": ["12px", {"lineHeight": "16px", "fontWeight": "450"}],
+                    "title-sm": ["16px", {"lineHeight": "24px", "fontWeight": "600"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .sidebar-active {
+            @apply text-secondary bg-surface-container-low border-r-2 border-secondary;
+        }
+        .form-input-focus:focus {
+            outline: none;
+            border-color: #0051d5;
+            box-shadow: 0 0 0 2px rgba(0, 81, 213, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-background font-body-md text-on-background flex h-screen overflow-hidden">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-full w-[240px] z-40 bg-surface-container-lowest border-r border-outline-variant flex flex-col py-stack-gap h-full hidden md:flex">
+<div class="px-container-padding mb-8">
+<h1 class="font-display-lg text-display-lg font-bold text-primary">FleetDrive Pro</h1>
+<p class="font-label-caps text-label-caps text-on-surface-variant">Precision Fleet Management</p>
+</div>
+<nav class="flex-grow space-y-1">
+<a class="flex items-center px-container-padding py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all duration-200 ease-in-out font-label-caps text-label-caps" href="#">
+<span class="material-symbols-outlined mr-3">dashboard</span> Dashboard
+            </a>
+<a class="flex items-center px-container-padding py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all duration-200 ease-in-out font-label-caps text-label-caps" href="#">
+<span class="material-symbols-outlined mr-3">speed</span> Add Test Drive
+            </a>
+<a class="flex items-center px-container-padding py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all duration-200 ease-in-out font-label-caps text-label-caps" href="#">
+<span class="material-symbols-outlined mr-3">directions_car</span> Vehicles
+            </a>
+<a class="flex items-center px-container-padding py-3 text-secondary bg-surface-container-low border-r-2 border-secondary font-label-caps text-label-caps" href="#">
+<span class="material-symbols-outlined mr-3">campaign</span> Marketing Activity
+            </a>
+<a class="flex items-center px-container-padding py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all duration-200 ease-in-out font-label-caps text-label-caps" href="#">
+<span class="material-symbols-outlined mr-3">badge</span> Sales Team
+            </a>
+<a class="flex items-center px-container-padding py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all duration-200 ease-in-out font-label-caps text-label-caps" href="#">
+<span class="material-symbols-outlined mr-3">analytics</span> Analytics
+            </a>
+</nav>
+<div class="mt-auto border-t border-outline-variant pt-4">
+<a class="flex items-center px-container-padding py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all duration-200 ease-in-out font-label-caps text-label-caps" href="#">
+<span class="material-symbols-outlined mr-3">settings</span> Settings
+            </a>
+<a class="flex items-center px-container-padding py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all duration-200 ease-in-out font-label-caps text-label-caps" href="#">
+<span class="material-symbols-outlined mr-3">logout</span> Logout
+            </a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-grow md:ml-[240px] flex flex-col h-full overflow-hidden">
+<!-- TopNavBar -->
+<header class="bg-surface-bright docked full-width top-0 sticky z-50 border-b border-outline-variant h-row-height-standard px-container-padding w-full flex justify-between items-center">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-on-surface-variant md:hidden">menu</span>
+<div class="relative hidden sm:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">search</span>
+<input class="bg-surface-container-low border-none rounded-lg pl-10 pr-4 py-1.5 text-body-md w-64 form-input-focus" placeholder="Search campaign..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:bg-surface-container-low transition-colors p-2 rounded-full">notifications</span>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:bg-surface-container-low transition-colors p-2 rounded-full">help</span>
+</div>
+<div class="flex items-center gap-3 ml-2">
+<div class="text-right hidden lg:block">
+<p class="font-title-sm text-on-surface">Alex Rivera</p>
+<p class="font-label-caps text-[9px] text-on-surface-variant">ADMINISTRATOR</p>
+</div>
+<img alt="Administrator profile photo" class="w-8 h-8 rounded-full border border-outline-variant object-cover" data-alt="A professional headshot of a Hispanic male administrator in his late 30s wearing a clean-cut navy blazer and white shirt. The background is a blurred corporate office setting with soft, natural lighting. The overall style is modern and high-key, aligning with a corporate fleet management software aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDFu_6WrmqguIZMWiK-iHURJ0Dp5McBxJab9e2j8fSqg41ROK8J4tKbl_SXSbI5dYQaR9zzlsr9yybvwz9_C8UZ-R2PdzmAisafOYlKuKGPIWhnvNKQV-Qxf6QGFmkxSAzH0nwk40wfa7KH3FTmK1a71a9CnHmnPDPcxU678y4lFgs1PFOwav8PSAspT8e2z_XFjng9IZwGZNsLuszWfiOhepdSPRuC7BdHs6b34BLTlyl1Xr2lYcwHlFlOvClfdUkx5BXfM8RwJQk"/>
+</div>
+</div>
+</header>
+<!-- Content Canvas -->
+<section class="flex-grow overflow-y-auto p-container-padding">
+<div class="max-w-5xl mx-auto">
+<!-- Page Header -->
+<div class="mb-8">
+<div class="flex items-center gap-2 text-secondary mb-2">
+<span class="material-symbols-outlined text-sm">arrow_back</span>
+<span class="font-label-caps text-label-caps">BACK TO LIST</span>
+</div>
+<h2 class="font-headline-md text-headline-md text-primary">Record Marketing Campaign</h2>
+<p class="text-on-surface-variant font-body-md">Schedule and assign promotional fleet activities to specific vehicle clusters.</p>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<!-- Form Section -->
+<div class="lg:col-span-8 bg-surface-container-lowest border border-outline-variant p-8 shadow-sm">
+<form class="space-y-8" id="campaignForm">
+<!-- Campaign Identity -->
+<div class="space-y-4">
+<label class="block font-title-sm text-on-surface">Campaign Title</label>
+<input class="w-full border border-outline px-4 py-3 text-body-md focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-all" placeholder="e.g. Summer Executive SUV Showcase" type="text"/>
+</div>
+<!-- Vehicle Selection (Multi-select simulation) -->
+<div class="space-y-4">
+<label class="block font-title-sm text-on-surface">Select Vehicles</label>
+<div class="relative">
+<div class="w-full border border-outline px-4 py-3 flex flex-wrap gap-2 min-h-[48px] items-center cursor-pointer" onclick="toggleDropdown()">
+<div class="bg-secondary-fixed text-on-secondary-fixed-variant px-2 py-1 flex items-center gap-2 rounded-sm text-xs font-semibold">
+                                            BMW X5 (742-AD) <span class="material-symbols-outlined text-[14px]">close</span>
+</div>
+<div class="bg-secondary-fixed text-on-secondary-fixed-variant px-2 py-1 flex items-center gap-2 rounded-sm text-xs font-semibold">
+                                            Audi Q7 (911-LP) <span class="material-symbols-outlined text-[14px]">close</span>
+</div>
+<span class="text-on-surface-variant opacity-50 ml-auto">
+<span class="material-symbols-outlined">expand_more</span>
+</span>
+</div>
+<div class="hidden absolute top-full left-0 w-full bg-white border border-outline-variant shadow-lg z-10 mt-1 max-h-48 overflow-y-auto" id="vehicleDropdown">
+<div class="px-4 py-2 hover:bg-surface-container cursor-pointer text-body-md border-b border-outline-variant">Mercedes GLE (442-KK)</div>
+<div class="px-4 py-2 hover:bg-surface-container cursor-pointer text-body-md border-b border-outline-variant">Tesla Model Y (881-ST)</div>
+<div class="px-4 py-2 hover:bg-surface-container cursor-pointer text-body-md border-b border-outline-variant">Porsche Cayenne (007-GT)</div>
+</div>
+</div>
+</div>
+<!-- Date Range -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="space-y-4">
+<label class="block font-title-sm text-on-surface">From Date</label>
+<div class="relative">
+<input class="w-full border border-outline px-4 py-3 text-body-md focus:border-secondary outline-none" type="date"/>
+</div>
+</div>
+<div class="space-y-4">
+<label class="block font-title-sm text-on-surface">To Date</label>
+<div class="relative">
+<input class="w-full border border-outline px-4 py-3 text-body-md focus:border-secondary outline-none" type="date"/>
+</div>
+</div>
+</div>
+<!-- Campaign Details -->
+<div class="space-y-4">
+<label class="block font-title-sm text-on-surface">Campaign Details</label>
+<textarea class="w-full border border-outline px-4 py-3 text-body-md focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-all resize-none" placeholder="Describe the campaign objectives, target audience, and specific vehicle usage requirements..." rows="6"></textarea>
+</div>
+<!-- Actions -->
+<div class="flex items-center justify-end gap-4 pt-4 border-t border-outline-variant">
+<button class="px-6 py-3 font-title-sm text-on-surface-variant hover:bg-surface-container transition-colors" type="button">Discard Draft</button>
+<button class="px-10 py-3 bg-secondary text-on-secondary font-title-sm hover:brightness-90 transition-all shadow-sm" type="submit">Save &amp; Launch</button>
+</div>
+</form>
+</div>
+<!-- Sidebar Context -->
+<div class="lg:col-span-4 space-y-6">
+<!-- Helper Card 1 -->
+<div class="bg-surface-container-low p-6 border border-outline-variant">
+<h3 class="font-title-sm text-on-surface mb-3 flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary">info</span> Campaign Guidelines
+                            </h3>
+<ul class="space-y-3 text-body-sm text-on-surface-variant">
+<li class="flex items-start gap-2">
+<span class="mt-1 w-1 h-1 bg-secondary rounded-full flex-shrink-0"></span>
+<span>Vehicles in "Active" test drive status cannot be selected.</span>
+</li>
+<li class="flex items-start gap-2">
+<span class="mt-1 w-1 h-1 bg-secondary rounded-full flex-shrink-0"></span>
+<span>Campaigns exceeding 30 days require Regional Director approval.</span>
+</li>
+<li class="flex items-start gap-2">
+<span class="mt-1 w-1 h-1 bg-secondary rounded-full flex-shrink-0"></span>
+<span>Fuel and detailing costs will be automatically attributed to the Marketing cost center.</span>
+</li>
+</ul>
+</div>
+<!-- Mini Chart Preview -->
+<div class="bg-surface-container-lowest p-6 border border-outline-variant relative overflow-hidden group">
+<div class="relative z-10">
+<h3 class="font-label-caps text-label-caps text-on-surface-variant mb-4">ESTIMATED REACH</h3>
+<div class="flex items-end gap-1 h-16 mb-4">
+<div class="flex-1 bg-secondary opacity-20 h-1/2"></div>
+<div class="flex-1 bg-secondary opacity-30 h-3/4"></div>
+<div class="flex-1 bg-secondary opacity-50 h-2/3"></div>
+<div class="flex-1 bg-secondary opacity-70 h-5/6"></div>
+<div class="flex-1 bg-secondary h-full"></div>
+</div>
+<div class="flex justify-between items-center">
+<span class="font-display-lg text-headline-md text-primary">12.4k</span>
+<span class="text-green-600 text-xs font-bold">+18.2% vs Last Month</span>
+</div>
+</div>
+<!-- Subtle pattern overlay -->
+<div class="absolute inset-0 opacity-[0.03] pointer-events-none bg-[radial-gradient(#000_1px,transparent_1px)] [background-size:16px_16px]"></div>
+</div>
+<!-- Image Visual -->
+<div class="aspect-video w-full bg-surface-variant border border-outline-variant relative overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A sleek dark luxury SUV parked in a minimalist, brightly lit concrete studio. The lighting is cold and professional with soft shadows, emphasizing the vehicle's aerodynamic curves. The atmosphere is upscale and sterile, perfectly fitting the high-end corporate brand identity of FleetDrive Pro. Predominant colors are silver, charcoal, and crisp white." src="https://lh3.googleusercontent.com/aida-public/AB6AXuApF-CYc1FmrDZRCFq3NNwVkb6WyE5iyAnm9p3kIDapk-OcPY2RWKVXbQwIJ0JVCnl5ly0wAFMwyKGVysx5W-SQqffHqc2-Qr5W03anFkmsTKJN2soeCGFRt451deo-UZUKurFVZjorV4aNT_dM3YDAmctZpA57h2JPTpwaF9jNl9vjA43MOOk3sSgrkjDRDxtiOmppJJILPCnYJXCYOOvKKGfh5XPnk4ImFD4Mwro0qTjehYqPBhPRB1ciOvewvFM8s90vyj_K8MU"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
+<p class="text-white text-xs font-label-caps">VISUAL ASSET PREVIEW: LUXURY SEGMENT</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Mobile Bottom Nav -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full bg-surface-bright border-t border-outline-variant flex justify-around items-center h-16 z-50 px-4">
+<span class="material-symbols-outlined text-secondary">dashboard</span>
+<span class="material-symbols-outlined text-on-surface-variant">directions_car</span>
+<div class="bg-secondary w-12 h-12 rounded-full -mt-6 flex items-center justify-center shadow-lg border-4 border-background">
+<span class="material-symbols-outlined text-white">add</span>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant" style="font-variation-settings: 'FILL' 1;">campaign</span>
+<span class="material-symbols-outlined text-on-surface-variant">person</span>
+</nav>
+<script>
+        function toggleDropdown() {
+            const dropdown = document.getElementById('vehicleDropdown');
+            dropdown.classList.toggle('hidden');
+        }
+
+        // Close dropdown when clicking outside
+        window.onclick = function(event) {
+            if (!event.target.closest('.relative')) {
+                const dropdowns = document.getElementsByClassName("dropdown-content");
+                document.getElementById('vehicleDropdown').classList.add('hidden');
+            }
+        }
+
+        // Form submission micro-interaction
+        document.getElementById('campaignForm').onsubmit = function(e) {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            const originalText = btn.innerText;
+            btn.innerText = 'Processing...';
+            btn.classList.add('opacity-50');
+            btn.disabled = true;
+            
+            setTimeout(() => {
+                alert('Campaign Saved Successfully!');
+                btn.innerText = originalText;
+                btn.classList.remove('opacity-50');
+                btn.disabled = false;
+            }, 1000);
+        }
+    </script>
+</body></html>

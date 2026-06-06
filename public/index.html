@@ -1,0 +1,1455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FleetDrive Pro</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;450;500&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['Hanken Grotesk','sans-serif'],
+            body: ['Inter','sans-serif'],
+            mono: ['JetBrains Mono','monospace'],
+          },
+          colors: {
+            primary: '#000000',
+            secondary: '#0051d5',
+            surface: '#f7f9fb',
+            'surface-container': '#eeeff4',
+            'on-surface': '#191c1e',
+            'on-surface-variant': '#45464d',
+            'outline-variant': '#c6c6cd',
+            'secondary-container': '#316bf3',
+          },
+          borderRadius: {
+            DEFAULT: '0.125rem',
+            lg: '0.25rem',
+            xl: '0.5rem',
+            full: '0.75rem',
+          },
+          spacing: {
+            'gutter': '16px',
+            'container': '24px',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    *, body { font-family: 'Inter', sans-serif; }
+    h1, h2, h3, .font-display { font-family: 'Hanken Grotesk', sans-serif; }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+
+    .ms {
+      font-family: 'Material Symbols Outlined';
+      font-weight: normal; font-style: normal;
+      font-size: 20px; line-height: 1;
+      letter-spacing: normal; text-transform: none;
+      display: inline-block; white-space: nowrap; direction: ltr;
+      -webkit-font-feature-settings: 'liga'; font-feature-settings: 'liga';
+      -webkit-font-smoothing: antialiased;
+      font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+      vertical-align: middle;
+    }
+    .ms-fill { font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+
+    /* Sidebar */
+    #sidebar {
+      width: 240px; min-height: 100vh;
+      background: #fff; border-right: 1px solid #e8e8ed;
+      display: flex; flex-direction: column; flex-shrink: 0;
+    }
+    .nav-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 16px; cursor: pointer;
+      color: #45464d; font-size: 14px; font-weight: 500;
+      border-right: 2px solid transparent;
+      transition: all 0.15s; user-select: none;
+    }
+    .nav-item:hover { background: #f7f9fb; color: #191c1e; }
+    .nav-item.active {
+      background: #eef3ff; color: #0051d5;
+      border-right-color: #0051d5;
+    }
+    .nav-item.active .ms { font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+
+    /* Top bar */
+    #topbar {
+      height: 52px; background: #fff;
+      border-bottom: 1px solid #e8e8ed;
+      display: flex; align-items: center;
+      padding: 0 24px; gap: 12px;
+      position: sticky; top: 0; z-index: 20;
+    }
+    .search-bar {
+      flex: 1; max-width: 320px;
+      display: flex; align-items: center; gap: 8px;
+      background: #f7f9fb; border: 1px solid #e8e8ed;
+      border-radius: 6px; padding: 0 12px; height: 34px;
+    }
+    .search-bar input {
+      background: none; border: none; outline: none;
+      font-size: 13px; color: #191c1e; width: 100%;
+    }
+    .search-bar input::placeholder { color: #9899a1; }
+    .icon-btn {
+      width: 34px; height: 34px; border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: #45464d; transition: background 0.15s;
+    }
+    .icon-btn:hover { background: #f7f9fb; }
+    .user-chip {
+      display: flex; align-items: center; gap: 8px;
+      padding: 4px 10px 4px 4px;
+      border: 1px solid #e8e8ed; border-radius: 20px; cursor: pointer;
+    }
+    .avatar {
+      width: 26px; height: 26px; border-radius: 50%;
+      background: #0051d5; color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700;
+    }
+
+    /* Forms */
+    .field-wrap { position: relative; }
+    .field-icon {
+      position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+      color: #9899a1; font-size: 18px; pointer-events: none;
+    }
+    .field-icon.top { top: 14px; transform: none; }
+    .form-input {
+      width: 100%; height: 44px;
+      padding: 0 12px; border: 1px solid #c6c6cd;
+      border-radius: 6px; font-size: 14px; color: #191c1e;
+      background: #fff; outline: none; transition: border-color 0.15s, box-shadow 0.15s;
+      font-family: 'Inter', sans-serif;
+    }
+    .form-input.has-icon { padding-left: 40px; }
+    .form-input:focus { border-color: #0051d5; box-shadow: 0 0 0 3px rgba(0,81,213,0.12); }
+    .form-input::placeholder { color: #9899a1; }
+    select.form-input { appearance: none; cursor: pointer; }
+    textarea.form-input { height: auto; padding: 12px; resize: vertical; }
+    .form-label {
+      font-size: 11px; font-weight: 700; letter-spacing: 0.06em;
+      text-transform: uppercase; color: #45464d; display: block; margin-bottom: 6px;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 0 20px; height: 38px; border-radius: 6px;
+      font-size: 14px; font-weight: 600; cursor: pointer;
+      border: none; transition: all 0.15s; white-space: nowrap;
+    }
+    .btn-primary { background: #0051d5; color: #fff; }
+    .btn-primary:hover { background: #003fa3; }
+    .btn-primary:active { background: #002d7a; }
+    .btn-outline { background: #fff; color: #191c1e; border: 1px solid #c6c6cd; }
+    .btn-outline:hover { background: #f7f9fb; }
+    .btn-black { background: #191c1e; color: #fff; }
+    .btn-black:hover { background: #000; }
+    .btn-danger { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
+    .btn-danger:hover { background: #fecaca; }
+    .btn-sm { height: 30px; padding: 0 12px; font-size: 13px; }
+
+    /* Category radio buttons */
+    .cat-btn input[type=radio] { display: none; }
+    .cat-btn label {
+      display: block; padding: 8px 14px;
+      border: 1px solid #c6c6cd; border-radius: 6px;
+      font-size: 13px; font-weight: 500; color: #45464d;
+      cursor: pointer; text-align: center; transition: all 0.15s;
+    }
+    .cat-btn input:checked + label {
+      background: #0051d5; border-color: #0051d5; color: #fff;
+    }
+    .cat-btn label:hover { border-color: #0051d5; color: #0051d5; }
+
+    /* Cards */
+    .card { background: #fff; border: 1px solid #e8e8ed; border-radius: 8px; }
+
+    /* Table */
+    .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .data-table thead th {
+      padding: 10px 14px; text-align: left;
+      font-size: 11px; font-weight: 700; letter-spacing: 0.05em;
+      text-transform: uppercase; color: #45464d;
+      background: #f7f9fb; border-bottom: 1px solid #e8e8ed;
+      white-space: nowrap;
+    }
+    .data-table tbody td { padding: 13px 14px; border-bottom: 1px solid #f3f4f6; color: #191c1e; }
+    .data-table tbody tr:hover { background: rgba(49,107,243,0.04); }
+    .data-table tbody tr:last-child td { border-bottom: none; }
+
+    /* Badges */
+    .badge {
+      display: inline-flex; align-items: center;
+      padding: 2px 10px; border-radius: 20px;
+      font-size: 11px; font-weight: 700; letter-spacing: 0.02em;
+    }
+    .badge-blue   { background: #dbeafe; color: #1d4ed8; }
+    .badge-green  { background: #dcfce7; color: #15803d; }
+    .badge-amber  { background: #fef3c7; color: #b45309; }
+    .badge-gray   { background: #f3f4f6; color: #4b5563; }
+    .badge-red    { background: #fee2e2; color: #b91c1c; }
+
+    /* Stat cards */
+    .stat-card { background: #fff; border: 1px solid #e8e8ed; border-radius: 8px; padding: 18px 20px; }
+    .stat-value { font-family: 'Hanken Grotesk', sans-serif; font-size: 28px; font-weight: 700; color: #191c1e; }
+    .stat-label { font-size: 12px; color: #45464d; margin-top: 2px; }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.45);
+      z-index: 50; display: flex; align-items: center; justify-content: center; padding: 20px;
+    }
+    .modal-box {
+      background: #fff; border-radius: 12px; padding: 28px;
+      width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto;
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed; bottom: 28px; right: 28px; z-index: 100;
+      padding: 12px 18px; border-radius: 8px; font-size: 14px; font-weight: 500;
+      display: flex; align-items: center; gap: 8px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+      transform: translateY(80px); opacity: 0; transition: all 0.3s ease;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast-success { background: #fff; border: 1px solid #bbf7d0; color: #15803d; }
+    .toast-error   { background: #fff; border: 1px solid #fecaca; color: #b91c1c; }
+
+    /* Pages */
+    .page { display: none; }
+    .page.active { display: block; }
+    #login-screen { display: none; }
+    #login-screen.active { display: flex; }
+
+    /* Live preview dark card */
+    .preview-dark {
+      background: #191c1e; border-radius: 8px; padding: 24px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      min-height: 160px; color: #fff;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #c6c6cd; border-radius: 4px; }
+
+    /* Select chevron */
+    .select-wrap { position: relative; }
+    .select-wrap::after {
+      content: 'expand_more';
+      font-family: 'Material Symbols Outlined';
+      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+      color: #45464d; pointer-events: none; font-size: 20px;
+    }
+    .select-wrap select { padding-right: 36px; }
+  </style>
+</head>
+<body class="bg-surface">
+
+<!-- Toast -->
+<div id="toast" class="toast">
+  <span class="ms" id="toast-icon">check_circle</span>
+  <span id="toast-msg"></span>
+</div>
+
+<!-- ════════════════════════ LOGIN ════════════════════════ -->
+<div id="login-screen" class="min-h-screen items-center justify-center bg-surface">
+  <div class="w-full max-w-sm">
+    <div class="text-center mb-8">
+      <div class="inline-flex items-center gap-3 mb-2">
+        <div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
+          <span class="ms text-white" style="font-size:22px">directions_car</span>
+        </div>
+        <div class="text-left">
+          <div class="font-display text-xl font-bold text-on-surface leading-tight">FleetDrive Pro</div>
+          <div class="text-xs text-on-surface-variant tracking-widest uppercase">Precision Fleet Management</div>
+        </div>
+      </div>
+    </div>
+    <div class="card p-8">
+      <h2 class="font-display text-xl font-semibold mb-1">Sign In</h2>
+      <p class="text-sm text-on-surface-variant mb-6">Enter your credentials to continue</p>
+      <form id="login-form" class="space-y-4">
+        <div>
+          <label class="form-label">Email</label>
+          <div class="field-wrap">
+            <span class="ms field-icon">mail</span>
+            <input type="email" id="login-email" class="form-input has-icon" placeholder="you@company.com" required />
+          </div>
+        </div>
+        <div>
+          <label class="form-label">Password</label>
+          <div class="field-wrap">
+            <span class="ms field-icon">lock</span>
+            <input type="password" id="login-password" class="form-input has-icon" placeholder="••••••••" required />
+          </div>
+        </div>
+        <p id="login-error" class="text-red-600 text-sm hidden"></p>
+        <button type="submit" class="btn btn-primary w-full justify-center" style="height:44px">
+          Sign In
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════ APP ════════════════════════ -->
+<div id="app" class="hidden flex min-h-screen">
+
+  <!-- Sidebar -->
+  <aside id="sidebar">
+    <!-- Brand -->
+    <div class="px-5 py-5" style="border-bottom:1px solid #e8e8ed">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 bg-primary rounded-lg flex items-center justify-center flex-shrink-0">
+          <span class="ms text-white" style="font-size:20px">directions_car</span>
+        </div>
+        <div>
+          <div class="font-display font-bold text-on-surface" style="font-size:14px;line-height:1.2">FleetDrive Pro</div>
+          <div class="text-on-surface-variant" style="font-size:9px;letter-spacing:0.08em;text-transform:uppercase;margin-top:1px">Precision Fleet Management</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Nav -->
+    <nav class="flex-1 py-3" id="sidebar-nav"></nav>
+
+    <!-- Bottom -->
+    <div style="border-top:1px solid #e8e8ed;padding:8px 0">
+      <div class="nav-item" onclick="logout()">
+        <span class="ms">logout</span>
+        <span>Logout</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="flex-1 flex flex-col min-w-0">
+
+    <!-- Top bar -->
+    <div id="topbar">
+      <div class="search-bar">
+        <span class="ms" style="font-size:18px;color:#9899a1">search</span>
+        <input type="text" placeholder="Search entries…" id="search-input" />
+      </div>
+      <div class="flex-1"></div>
+      <div class="icon-btn" title="Notifications"><span class="ms">notifications</span></div>
+      <div class="icon-btn" title="Help"><span class="ms">help</span></div>
+      <div class="user-chip">
+        <div class="avatar" id="top-avatar">A</div>
+        <div class="text-left">
+          <div class="text-xs font-semibold text-on-surface leading-tight" id="top-name">Admin</div>
+          <div style="font-size:10px;color:#9899a1;text-transform:uppercase;letter-spacing:0.05em" id="top-role">ADMINISTRATOR</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Page content -->
+    <div class="flex-1 overflow-auto">
+
+      <!-- ── DASHBOARD ─────────────────────────────── -->
+      <div id="page-dashboard" class="page p-6">
+        <div class="mb-6">
+          <h1 class="font-display text-2xl font-bold text-on-surface">Dashboard</h1>
+          <p class="text-sm text-on-surface-variant mt-1" id="dash-branch-label">Overview of test drive activity</p>
+        </div>
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div class="stat-card"><div class="stat-value" id="stat-total">—</div><div class="stat-label">Total Test Drives</div></div>
+          <div class="stat-card"><div class="stat-value text-secondary" id="stat-today">—</div><div class="stat-label">Active Today</div></div>
+          <div class="stat-card"><div class="stat-value" id="stat-cars">—</div><div class="stat-label">Vehicles Out</div></div>
+          <div class="stat-card"><div class="stat-value" id="stat-consultants">—</div><div class="stat-label">Active Consultants</div></div>
+        </div>
+        <!-- Recent drives table -->
+        <div class="card overflow-hidden">
+          <div class="px-5 py-4 flex items-center justify-between" style="border-bottom:1px solid #e8e8ed">
+            <span class="font-display font-semibold text-on-surface">Recent Test Drives</span>
+            <button class="btn btn-outline btn-sm" onclick="navigate('test-drives')">View All</button>
+          </div>
+          <div class="overflow-x-auto" id="recent-drives-body"></div>
+        </div>
+      </div>
+
+      <!-- ── TEST DRIVES LIST ────────────────────────── -->
+      <div id="page-test-drives" class="page p-6">
+        <div class="flex items-start justify-between mb-6">
+          <div>
+            <div class="text-xs font-bold text-on-surface-variant tracking-widest uppercase mb-1">Operations</div>
+            <h1 class="font-display text-2xl font-bold text-on-surface">Test Drives</h1>
+          </div>
+          <button class="btn btn-primary" onclick="navigate('add-test-drive')">
+            <span class="ms">add</span> New Entry
+          </button>
+        </div>
+        <!-- Filters -->
+        <div class="flex gap-3 mb-4 flex-wrap items-end">
+          <div>
+            <label class="form-label">From Date</label>
+            <input type="date" id="filter-from" class="form-input" style="width:160px;height:36px" />
+          </div>
+          <div>
+            <label class="form-label">To Date</label>
+            <input type="date" id="filter-to" class="form-input" style="width:160px;height:36px" />
+          </div>
+          <button class="btn btn-outline btn-sm" style="margin-bottom:0" onclick="loadTestDrives()">
+            <span class="ms">filter_list</span> Apply
+          </button>
+          <button class="btn btn-outline btn-sm" onclick="clearFilters()">
+            <span class="ms">clear</span> Clear
+          </button>
+        </div>
+        <div class="card overflow-hidden">
+          <div class="overflow-x-auto" id="drives-table-body"></div>
+        </div>
+      </div>
+
+      <!-- ── ADD TEST DRIVE ──────────────────────────── -->
+      <div id="page-add-test-drive" class="page p-6">
+        <!-- Breadcrumb -->
+        <div class="flex items-center gap-2 text-sm text-on-surface-variant mb-4">
+          <span class="cursor-pointer hover:text-secondary" onclick="navigate('test-drives')">Operations</span>
+          <span class="ms" style="font-size:16px">chevron_right</span>
+          <span class="cursor-pointer hover:text-secondary" onclick="navigate('test-drives')">Test Drives</span>
+          <span class="ms" style="font-size:16px">chevron_right</span>
+          <span class="text-on-surface font-medium">New Entry</span>
+        </div>
+        <div class="flex items-center justify-between mb-6">
+          <h1 class="font-display text-2xl font-bold text-on-surface">New Test Drive Entry</h1>
+        </div>
+        <div class="max-w-2xl">
+          <div class="card p-6">
+            <form id="td-form" class="space-y-5">
+              <!-- Row 1 -->
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="form-label">Test Drive Date</label>
+                  <div class="field-wrap">
+                    <span class="ms field-icon">calendar_today</span>
+                    <input type="date" id="td-date" class="form-input has-icon" required />
+                  </div>
+                </div>
+                <div>
+                  <label class="form-label">TD Slip ID</label>
+                  <div class="field-wrap">
+                    <span class="ms field-icon" style="font-size:16px;color:#9899a1;left:13px">#</span>
+                    <input type="text" id="td-slip" class="form-input has-icon" placeholder="e.g. TD-2023-8842" />
+                  </div>
+                </div>
+              </div>
+              <!-- Row 2 -->
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="form-label">Customer Name</label>
+                  <div class="field-wrap">
+                    <span class="ms field-icon">person</span>
+                    <input type="text" id="td-customer-name" class="form-input has-icon" placeholder="Enter full name" required />
+                  </div>
+                </div>
+                <div>
+                  <label class="form-label">Customer Phone</label>
+                  <div class="field-wrap">
+                    <span class="ms field-icon">phone</span>
+                    <input type="tel" id="td-customer-phone" class="form-input has-icon" placeholder="+91 98765 43210" />
+                  </div>
+                </div>
+              </div>
+              <!-- Row 3: Vehicle + Consultant -->
+              <div>
+                <label class="form-label">Vehicle</label>
+                <div class="select-wrap field-wrap">
+                  <span class="ms field-icon">directions_car</span>
+                  <select id="td-car" class="form-input has-icon" required>
+                    <option value="">Select Vehicle</option>
+                  </select>
+                </div>
+              </div>
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="form-label">Sales Consultant</label>
+                  <div class="select-wrap field-wrap">
+                    <span class="ms field-icon">badge</span>
+                    <select id="td-consultant" class="form-input has-icon">
+                      <option value="">Select Consultant</option>
+                    </select>
+                  </div>
+                </div>
+                <div>
+                  <label class="form-label">Showroom Type</label>
+                  <div class="select-wrap field-wrap">
+                    <span class="ms field-icon">store</span>
+                    <select id="td-showroom" class="form-input has-icon">
+                      <option value="Showroom">Showroom TD</option>
+                      <option value="Home TD">Home TD</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <!-- KMS -->
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="form-label">KMS Out</label>
+                  <div class="field-wrap">
+                    <span class="ms field-icon">speed</span>
+                    <input type="number" step="0.1" id="td-kms-out" class="form-input has-icon" placeholder="e.g. 12450" />
+                  </div>
+                </div>
+                <div>
+                  <label class="form-label">KMS In</label>
+                  <div class="field-wrap">
+                    <span class="ms field-icon">speed</span>
+                    <input type="number" step="0.1" id="td-kms-in" class="form-input has-icon" placeholder="e.g. 12450" />
+                  </div>
+                </div>
+              </div>
+              <!-- Category -->
+              <div>
+                <label class="form-label">TD Category</label>
+                <div class="grid grid-cols-3 gap-2" style="grid-template-columns:repeat(6,1fr)">
+                  <div class="cat-btn"><input type="radio" name="td-cat" id="cat1" value="Test Drive" checked /><label for="cat1">TEST DRIVE</label></div>
+                  <div class="cat-btn"><input type="radio" name="td-cat" id="cat2" value="Activity" /><label for="cat2">ACTIVITY</label></div>
+                  <div class="cat-btn"><input type="radio" name="td-cat" id="cat3" value="Experience" /><label for="cat3">EXPERIENCE</label></div>
+                  <div class="cat-btn"><input type="radio" name="td-cat" id="cat4" value="Repeat Drive" /><label for="cat4">REPEAT DRIVE</label></div>
+                  <div class="cat-btn"><input type="radio" name="td-cat" id="cat5" value="Connected Rides" /><label for="cat5">CONNECTED RIDES</label></div>
+                  <div class="cat-btn"><input type="radio" name="td-cat" id="cat6" value="Others" /><label for="cat6">OTHERS</label></div>
+                </div>
+              </div>
+              <!-- Remarks -->
+              <div>
+                <label class="form-label">Remarks &amp; Special Instructions</label>
+                <textarea id="td-remarks" class="form-input" rows="4" placeholder="Mention route preference, customer expectations, or vehicle conditions…"></textarea>
+              </div>
+              <!-- Actions -->
+              <div class="flex gap-3 pt-2">
+                <button type="button" class="btn btn-outline" onclick="navigate('test-drives')">Cancel</button>
+                <button type="submit" class="btn btn-primary flex-1 justify-center" id="td-submit-btn">
+                  <span class="ms">check_circle</span> Submit Entry
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Info cards -->
+          <div class="grid grid-cols-3 gap-3 mt-4">
+            <div class="card p-4">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="ms text-green-600" style="font-size:18px">verified_user</span>
+                <span class="text-xs font-semibold text-on-surface">Compliance Check</span>
+              </div>
+              <p class="text-xs text-on-surface-variant">All entries are logged and auditable.</p>
+            </div>
+            <div class="card p-4">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="ms text-secondary" style="font-size:18px">map</span>
+                <span class="text-xs font-semibold text-on-surface">Route Optimized</span>
+              </div>
+              <p class="text-xs text-on-surface-variant">KMS tracking enabled per entry.</p>
+            </div>
+            <div class="card p-4">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="ms text-amber-500" style="font-size:18px">shield</span>
+                <span class="text-xs font-semibold text-on-surface">Safety Protocol</span>
+              </div>
+              <p class="text-xs text-on-surface-variant">Consultant sign-off required.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── BRANCH CARS (VEHICLES) ─────────────────── -->
+      <div id="page-cars" class="page p-6">
+        <!-- Header -->
+        <div class="flex items-start justify-between mb-6">
+          <div>
+            <div class="text-xs font-bold text-on-surface-variant tracking-widest uppercase mb-1">Inventory Management</div>
+            <h1 class="font-display text-2xl font-bold text-on-surface">Branch Vehicles</h1>
+            <p class="text-sm text-on-surface-variant mt-1">Vehicles registered to your branch</p>
+          </div>
+          <div class="flex gap-3">
+            <button class="btn btn-outline" onclick="showAddCarModal()"><span class="ms">add</span> Register Vehicle</button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <!-- Left: form + table -->
+          <div class="lg:col-span-2">
+            <div class="card overflow-hidden">
+              <div class="overflow-x-auto" id="cars-table-body"></div>
+            </div>
+          </div>
+          <!-- Right: info panels -->
+          <div class="space-y-4">
+            <div class="preview-dark">
+              <span class="ms text-white mb-3" style="font-size:48px;font-variation-settings:'FILL' 0,'wght' 200,'GRAD' 0,'opsz' 48">directions_car</span>
+              <div class="text-xs text-gray-400 tracking-widest uppercase">Live Preview</div>
+              <div class="text-white text-sm mt-1 font-medium" id="car-preview-text">Select a vehicle</div>
+            </div>
+            <div class="card p-4">
+              <div class="font-semibold text-on-surface text-sm mb-3 flex items-center gap-2">
+                <span class="ms text-secondary" style="font-size:18px">info</span> Compliance Check
+              </div>
+              <div class="space-y-2">
+                <div class="flex items-center gap-2 text-xs text-on-surface-variant">
+                  <span class="ms text-green-600" style="font-size:16px">check_circle</span> Registration verified on entry
+                </div>
+                <div class="flex items-center gap-2 text-xs text-on-surface-variant">
+                  <span class="ms text-green-600" style="font-size:16px">check_circle</span> Variant linked to admin models
+                </div>
+                <div class="flex items-center gap-2 text-xs text-on-surface-variant">
+                  <span class="ms text-on-surface-variant" style="font-size:16px">radio_button_unchecked</span> Insurance upload (next step)
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── CONSULTANTS ─────────────────────────────── -->
+      <div id="page-consultants" class="page p-6">
+        <div class="flex items-start justify-between mb-6">
+          <div>
+            <div class="text-xs font-bold text-on-surface-variant tracking-widest uppercase mb-1">Sales Team</div>
+            <h1 class="font-display text-2xl font-bold text-on-surface">Sales Consultants</h1>
+          </div>
+          <button class="btn btn-primary" onclick="showAddConsultantModal()">
+            <span class="ms">person_add</span> Add Consultant
+          </button>
+        </div>
+        <div class="card overflow-hidden">
+          <div class="overflow-x-auto" id="consultants-table-body"></div>
+        </div>
+      </div>
+
+      <!-- ── ADMIN: USERS ───────────────────────────── -->
+      <div id="page-users" class="page p-6">
+        <div class="flex items-start justify-between mb-6">
+          <div>
+            <div class="text-xs font-bold text-on-surface-variant tracking-widest uppercase mb-1">Admin Panel</div>
+            <h1 class="font-display text-2xl font-bold text-on-surface">Users</h1>
+          </div>
+          <button class="btn btn-primary" onclick="showAddUserModal()">
+            <span class="ms">person_add</span> Add User
+          </button>
+        </div>
+        <div class="card overflow-hidden">
+          <div class="overflow-x-auto" id="users-table-body"></div>
+        </div>
+      </div>
+
+      <!-- ── ADMIN: MODELS & VARIANTS ──────────────── -->
+      <div id="page-models" class="page p-6">
+        <div class="flex items-start justify-between mb-6">
+          <div>
+            <div class="text-xs font-bold text-on-surface-variant tracking-widest uppercase mb-1">Admin Panel</div>
+            <h1 class="font-display text-2xl font-bold text-on-surface">Car Models &amp; Variants</h1>
+          </div>
+          <button class="btn btn-primary" onclick="showAddModelModal()">
+            <span class="ms">add</span> Add Model
+          </button>
+        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="card overflow-hidden">
+            <div class="px-5 py-4 font-display font-semibold" style="border-bottom:1px solid #e8e8ed">Car Models</div>
+            <div class="overflow-x-auto" id="models-table-body"></div>
+          </div>
+          <div class="card overflow-hidden">
+            <div class="px-5 py-4 font-display font-semibold flex items-center justify-between" style="border-bottom:1px solid #e8e8ed">
+              <span>Variants <span class="text-on-surface-variant font-normal text-sm" id="variant-of-model"></span></span>
+            </div>
+            <div class="overflow-x-auto" id="variants-table-body"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── ADMIN: BRANCHES ───────────────────────── -->
+      <div id="page-branches" class="page p-6">
+        <div class="flex items-start justify-between mb-6">
+          <div>
+            <div class="text-xs font-bold text-on-surface-variant tracking-widest uppercase mb-1">Admin Panel</div>
+            <h1 class="font-display text-2xl font-bold text-on-surface">Branches</h1>
+          </div>
+          <button class="btn btn-primary" onclick="showAddBranchModal()">
+            <span class="ms">add</span> Add Branch
+          </button>
+        </div>
+        <div class="card overflow-hidden max-w-lg">
+          <div class="overflow-x-auto" id="branches-table-body"></div>
+        </div>
+      </div>
+
+    </div><!-- /page content -->
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<!-- ════════════════════════ MODAL ════════════════════════ -->
+<div id="modal" class="modal-overlay hidden" onclick="if(event.target===this)closeModal()">
+  <div class="modal-box">
+    <div class="flex items-center justify-between mb-5">
+      <h3 class="font-display text-lg font-semibold" id="modal-title">Modal</h3>
+      <button onclick="closeModal()" class="icon-btn"><span class="ms">close</span></button>
+    </div>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════
+//  State
+// ════════════════════════════════════════════════════════
+let currentUser = null;
+let selectedModelId = null;
+
+// ════════════════════════════════════════════════════════
+//  API
+// ════════════════════════════════════════════════════════
+async function api(method, path, body) {
+  const opts = { method, headers: { 'Content-Type': 'application/json' } };
+  const token = localStorage.getItem('token');
+  if (token) opts.headers['Authorization'] = 'Bearer ' + token;
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch('/api' + path, opts);
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || 'Request failed');
+  return data;
+}
+const get  = p => api('GET', p);
+const post = (p, b) => api('POST', p, b);
+const put  = (p, b) => api('PUT', p, b);
+const del  = p => api('DELETE', p);
+
+// ════════════════════════════════════════════════════════
+//  Toast
+// ════════════════════════════════════════════════════════
+function toast(msg, type = 'success') {
+  const el = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  document.getElementById('toast-icon').textContent = type === 'success' ? 'check_circle' : 'error';
+  el.className = `toast toast-${type} show`;
+  setTimeout(() => el.classList.remove('show'), 3500);
+}
+
+// ════════════════════════════════════════════════════════
+//  Modal
+// ════════════════════════════════════════════════════════
+function showModal(title, html, onSubmit) {
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-body').innerHTML = html;
+  document.getElementById('modal').classList.remove('hidden');
+  if (onSubmit) {
+    const form = document.querySelector('#modal-body form');
+    if (form) form.addEventListener('submit', e => { e.preventDefault(); onSubmit(); });
+  }
+}
+function closeModal() { document.getElementById('modal').classList.add('hidden'); }
+
+// ════════════════════════════════════════════════════════
+//  Auth
+// ════════════════════════════════════════════════════════
+document.getElementById('login-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const errEl = document.getElementById('login-error');
+  errEl.classList.add('hidden');
+  const btn = e.target.querySelector('button[type=submit]');
+  btn.disabled = true; btn.textContent = 'Signing in…';
+  try {
+    const { token, user } = await post('/auth/login', {
+      email: document.getElementById('login-email').value,
+      password: document.getElementById('login-password').value,
+    });
+    localStorage.setItem('token', token);
+    currentUser = user;
+    boot();
+  } catch (err) {
+    errEl.textContent = err.message; errEl.classList.remove('hidden');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Sign In';
+  }
+});
+
+function logout() {
+  localStorage.removeItem('token');
+  currentUser = null;
+  document.getElementById('login-screen').classList.add('active');
+  document.getElementById('app').classList.add('hidden');
+}
+
+// ════════════════════════════════════════════════════════
+//  Boot
+// ════════════════════════════════════════════════════════
+function boot() {
+  document.getElementById('login-screen').classList.remove('active');
+  document.getElementById('app').classList.remove('hidden');
+  // Top bar
+  document.getElementById('top-avatar').textContent = currentUser.name.charAt(0).toUpperCase();
+  document.getElementById('top-name').textContent = currentUser.name;
+  document.getElementById('top-role').textContent = currentUser.role.toUpperCase();
+  buildNav();
+  navigate('dashboard');
+}
+
+function buildNav() {
+  const isAdmin = currentUser.role === 'admin';
+  const items = [
+    { id: 'dashboard',       icon: 'dashboard',       label: 'Dashboard',          roles: ['admin','coordinator'] },
+    { id: 'add-test-drive',  icon: 'add_circle',       label: 'Add Test Drive',     roles: ['admin','coordinator'] },
+    { id: 'test-drives',     icon: 'drive_eta',        label: 'Test Drives',        roles: ['admin','coordinator'] },
+    { id: 'cars',            icon: 'directions_car',   label: 'Vehicles',           roles: ['admin','coordinator'] },
+    { id: 'consultants',     icon: 'badge',            label: 'Sales Team',         roles: ['admin','coordinator'] },
+    null,
+    { id: 'users',           icon: 'manage_accounts',  label: 'Admin Panel',        roles: ['admin'] },
+    { id: 'models',          icon: 'category',         label: 'Models & Variants',  roles: ['admin'] },
+    { id: 'branches',        icon: 'store',            label: 'Branches',           roles: ['admin'] },
+  ];
+
+  const nav = document.getElementById('sidebar-nav');
+  nav.innerHTML = '';
+  items.forEach(item => {
+    if (!item) {
+      const hr = document.createElement('hr');
+      hr.style.cssText = 'border:none;border-top:1px solid #e8e8ed;margin:6px 16px';
+      nav.appendChild(hr); return;
+    }
+    if (!item.roles.includes(currentUser.role)) return;
+    const div = document.createElement('div');
+    div.className = 'nav-item';
+    div.dataset.page = item.id;
+    div.innerHTML = `<span class="ms">${item.icon}</span><span>${item.label}</span>`;
+    div.addEventListener('click', () => navigate(item.id));
+    nav.appendChild(div);
+  });
+}
+
+// ════════════════════════════════════════════════════════
+//  Navigation
+// ════════════════════════════════════════════════════════
+const PAGE_IDS = ['dashboard','test-drives','add-test-drive','cars','consultants','users','models','branches'];
+
+function navigate(pageId) {
+  // Active nav
+  document.querySelectorAll('.nav-item[data-page]').forEach(el =>
+    el.classList.toggle('active', el.dataset.page === pageId)
+  );
+  // Hide all pages
+  PAGE_IDS.forEach(id => {
+    const el = document.getElementById('page-' + id);
+    if (el) el.classList.remove('active');
+  });
+  // Show target
+  const el = document.getElementById('page-' + pageId);
+  if (el) el.classList.add('active');
+
+  // Load data
+  const loaders = {
+    'dashboard':      loadDashboard,
+    'test-drives':    loadTestDrives,
+    'add-test-drive': initAddTD,
+    'cars':           loadCars,
+    'consultants':    loadConsultants,
+    'users':          loadUsers,
+    'models':         loadModels,
+    'branches':       loadBranches,
+  };
+  if (loaders[pageId]) loaders[pageId]();
+}
+
+// ════════════════════════════════════════════════════════
+//  Dashboard
+// ════════════════════════════════════════════════════════
+async function loadDashboard() {
+  try {
+    const stats = await get('/stats');
+    document.getElementById('stat-total').textContent = stats.totalDrives;
+    document.getElementById('stat-today').textContent = stats.todayDrives;
+    document.getElementById('stat-cars').textContent = stats.totalCars;
+    document.getElementById('stat-consultants').textContent = stats.totalConsultants;
+    if (currentUser.branch_name)
+      document.getElementById('dash-branch-label').textContent = currentUser.branch_name + ' — test drive activity';
+    const drives = await get('/test-drives');
+    renderDrivesTable(drives.slice(0, 8), 'recent-drives-body', true);
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+// ════════════════════════════════════════════════════════
+//  Test Drives
+// ════════════════════════════════════════════════════════
+async function loadTestDrives() {
+  const from = document.getElementById('filter-from').value;
+  const to   = document.getElementById('filter-to').value;
+  let q = '';
+  if (from) q += '&date_from=' + from;
+  if (to)   q += '&date_to=' + to;
+  try {
+    const drives = await get('/test-drives?' + q);
+    renderDrivesTable(drives, 'drives-table-body', false);
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+function clearFilters() {
+  document.getElementById('filter-from').value = '';
+  document.getElementById('filter-to').value = '';
+  loadTestDrives();
+}
+
+function renderDrivesTable(drives, containerId, compact) {
+  const el = document.getElementById(containerId);
+  if (!drives.length) {
+    el.innerHTML = '<div class="p-10 text-center text-on-surface-variant text-sm">No test drives found.</div>';
+    return;
+  }
+  const isAdmin = currentUser.role === 'admin';
+  el.innerHTML = `<table class="data-table">
+    <thead><tr>
+      <th>Date</th>
+      <th>TD Slip</th>
+      <th>Customer</th>
+      <th>Vehicle</th>
+      <th>Reg. No.</th>
+      ${compact ? '' : '<th>Consultant</th><th>Category</th><th>Type</th><th>KMs Out / In</th>'}
+      ${isAdmin && !compact ? '<th></th>' : ''}
+    </tr></thead>
+    <tbody>
+      ${drives.map(d => `<tr>
+        <td class="mono" style="font-size:12px">${d.drive_date}</td>
+        <td class="mono" style="font-size:12px;color:#45464d">${d.slip_id || '—'}</td>
+        <td>
+          <div class="font-medium text-on-surface">${d.customer_name}</div>
+          ${d.customer_phone ? `<div style="font-size:11px;color:#9899a1">${d.customer_phone}</div>` : ''}
+        </td>
+        <td>
+          <div class="font-medium">${d.brand} ${d.model_name}</div>
+          <div style="font-size:11px;color:#9899a1">${d.variant_name}</div>
+        </td>
+        <td class="mono" style="font-size:12px;font-weight:500">${d.regd_no}</td>
+        ${compact ? '' : `
+          <td style="font-size:13px">${d.consultant_name || '<span style="color:#c6c6cd">—</span>'}</td>
+          <td><span class="badge badge-blue">${d.category}</span></td>
+          <td><span class="badge badge-gray">${d.showroom_type}</span></td>
+          <td class="mono" style="font-size:12px">${d.kms_out ?? '—'} / ${d.kms_in ?? '—'}</td>
+        `}
+        ${isAdmin && !compact ? `<td><button class="btn btn-danger btn-sm" onclick="deleteDrive(${d.id})"><span class="ms" style="font-size:16px">delete</span></button></td>` : ''}
+      </tr>`).join('')}
+    </tbody>
+  </table>`;
+}
+
+async function deleteDrive(id) {
+  if (!confirm('Delete this test drive entry?')) return;
+  try { await del('/test-drives/' + id); toast('Entry deleted'); loadTestDrives(); }
+  catch(e) { toast(e.message, 'error'); }
+}
+
+// ════════════════════════════════════════════════════════
+//  Add Test Drive
+// ════════════════════════════════════════════════════════
+async function initAddTD() {
+  document.getElementById('td-date').value = new Date().toISOString().split('T')[0];
+  document.querySelector('input[name="td-cat"][value="Test Drive"]').checked = true;
+  document.getElementById('td-showroom').value = 'Showroom';
+  try {
+    const [cars, consultants] = await Promise.all([get('/cars'), get('/consultants')]);
+    const carSel = document.getElementById('td-car');
+    carSel.innerHTML = '<option value="">Select Vehicle</option>' +
+      cars.map(c => `<option value="${c.id}">${c.brand} ${c.model_name} — ${c.variant_name} | ${c.regd_no}</option>`).join('');
+    const cSel = document.getElementById('td-consultant');
+    cSel.innerHTML = '<option value="">Select Consultant</option>' +
+      consultants.map(c => `<option value="${c.id}">${c.first_name} ${c.last_name} (${c.employee_id})</option>`).join('');
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+document.getElementById('td-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const btn = document.getElementById('td-submit-btn');
+  btn.disabled = true; btn.innerHTML = '<span class="ms">hourglass_top</span> Processing…';
+  try {
+    await post('/test-drives', {
+      branch_id:       currentUser.branch_id,
+      car_id:          document.getElementById('td-car').value,
+      consultant_id:   document.getElementById('td-consultant').value || null,
+      slip_id:         document.getElementById('td-slip').value || null,
+      customer_name:   document.getElementById('td-customer-name').value,
+      customer_phone:  document.getElementById('td-customer-phone').value || null,
+      drive_date:      document.getElementById('td-date').value,
+      category:        document.querySelector('input[name="td-cat"]:checked')?.value || 'Test Drive',
+      showroom_type:   document.getElementById('td-showroom').value,
+      kms_out:         document.getElementById('td-kms-out').value || null,
+      kms_in:          document.getElementById('td-kms-in').value || null,
+      remarks:         document.getElementById('td-remarks').value || null,
+    });
+    btn.innerHTML = '<span class="ms ms-fill" style="color:#22c55e">check_circle</span> Submitted!';
+    setTimeout(() => {
+      btn.disabled = false;
+      btn.innerHTML = '<span class="ms">check_circle</span> Submit Entry';
+      e.target.reset();
+      document.getElementById('td-date').value = new Date().toISOString().split('T')[0];
+      navigate('test-drives');
+    }, 1200);
+    toast('Test drive recorded successfully!');
+  } catch(err) {
+    toast(err.message, 'error');
+    btn.disabled = false; btn.innerHTML = '<span class="ms">check_circle</span> Submit Entry';
+  }
+});
+
+// ════════════════════════════════════════════════════════
+//  Cars
+// ════════════════════════════════════════════════════════
+async function loadCars() {
+  try {
+    const cars = await get('/cars');
+    const el = document.getElementById('cars-table-body');
+    if (!cars.length) {
+      el.innerHTML = '<div class="p-10 text-center text-on-surface-variant text-sm">No vehicles registered yet. Click "Register Vehicle".</div>';
+      return;
+    }
+    const isAdmin = currentUser.role === 'admin';
+    el.innerHTML = `<table class="data-table">
+      <thead><tr>
+        <th>Reg. No.</th><th>Brand / Model</th><th>Variant</th><th>Fuel</th><th>Trans.</th><th>Status</th>
+        ${isAdmin ? '<th></th>' : ''}
+      </tr></thead>
+      <tbody>
+        ${cars.map(c => `<tr>
+          <td class="mono font-medium" style="font-size:13px">${c.regd_no}</td>
+          <td><div class="font-medium text-on-surface">${c.brand}</div><div style="font-size:11px;color:#9899a1">${c.model_name}</div></td>
+          <td>${c.variant_name}</td>
+          <td>${c.fuel_type}</td>
+          <td>${c.transmission}</td>
+          <td><span class="badge ${c.status==='available'?'badge-green':c.status==='in_use'?'badge-amber':'badge-gray'}">${c.status}</span></td>
+          ${isAdmin ? `<td><button class="btn btn-danger btn-sm" onclick="deleteCar(${c.id})"><span class="ms" style="font-size:16px">delete</span></button></td>` : ''}
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+async function showAddCarModal() {
+  try {
+    const [variants, branches] = await Promise.all([
+      get('/variants'),
+      currentUser.role === 'admin' ? get('/branches') : Promise.resolve([{ id: currentUser.branch_id, name: currentUser.branch_name }])
+    ]);
+    const html = `<form class="space-y-4">
+      ${currentUser.role === 'admin' ? `
+      <div>
+        <label class="form-label">Branch *</label>
+        <div class="select-wrap"><select id="car-branch" class="form-input" required>
+          ${branches.map(b => `<option value="${b.id}" ${b.id===currentUser.branch_id?'selected':''}>${b.name}</option>`).join('')}
+        </select></div>
+      </div>` : `<input type="hidden" id="car-branch" value="${currentUser.branch_id}" />`}
+      <div>
+        <label class="form-label">Vehicle Variant *</label>
+        <div class="select-wrap"><select id="car-variant" class="form-input" required>
+          <option value="">Select Variant…</option>
+          ${variants.map(v => `<option value="${v.id}">${v.brand} ${v.model_name} — ${v.name} (${v.fuel_type}, ${v.transmission})</option>`).join('')}
+        </select></div>
+      </div>
+      <div>
+        <label class="form-label">Registration Number *</label>
+        <div class="field-wrap">
+          <span class="ms field-icon">pin</span>
+          <input type="text" id="car-regd" class="form-input has-icon mono" placeholder="e.g. MH12AB1234" required style="text-transform:uppercase" />
+        </div>
+      </div>
+      <div>
+        <label class="form-label">Exterior Colour</label>
+        <div class="select-wrap"><select id="car-color" class="form-input">
+          <option value="">Select Colour</option>
+          ${['White','Black','Silver','Grey','Red','Blue','Brown','Orange','Yellow','Green'].map(c => `<option>${c}</option>`).join('')}
+        </select></div>
+      </div>
+      <div class="flex gap-3 pt-2">
+        <button type="button" class="btn btn-outline" onclick="closeModal()">Cancel</button>
+        <button type="submit" class="btn btn-primary flex-1 justify-center">Complete Registration</button>
+      </div>
+    </form>`;
+    showModal('Register New Vehicle', html, async () => {
+      try {
+        await post('/cars', {
+          variant_id: document.getElementById('car-variant').value,
+          branch_id:  document.getElementById('car-branch').value,
+          regd_no:    document.getElementById('car-regd').value,
+          color:      document.getElementById('car-color').value || null,
+        });
+        toast('Vehicle registered!'); closeModal(); loadCars();
+      } catch(err) { toast(err.message, 'error'); }
+    });
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+async function deleteCar(id) {
+  if (!confirm('Delete this vehicle?')) return;
+  try { await del('/cars/' + id); toast('Vehicle deleted'); loadCars(); }
+  catch(e) { toast(e.message, 'error'); }
+}
+
+// ════════════════════════════════════════════════════════
+//  Consultants
+// ════════════════════════════════════════════════════════
+async function loadConsultants() {
+  try {
+    const cs = await get('/consultants');
+    const el = document.getElementById('consultants-table-body');
+    if (!cs.length) {
+      el.innerHTML = '<div class="p-10 text-center text-on-surface-variant text-sm">No consultants yet. Click "Add Consultant".</div>';
+      return;
+    }
+    const isAdmin = currentUser.role === 'admin';
+    el.innerHTML = `<table class="data-table">
+      <thead><tr><th>Employee ID</th><th>Name</th><th>Type</th><th>Branch</th>${isAdmin?'<th></th>':''}</tr></thead>
+      <tbody>
+        ${cs.map(c => `<tr>
+          <td class="mono" style="font-size:12px">${c.employee_id}</td>
+          <td class="font-medium text-on-surface">${c.first_name} ${c.last_name}</td>
+          <td><span class="badge badge-gray">${c.type}</span></td>
+          <td style="font-size:13px">${c.branch_name}</td>
+          ${isAdmin?`<td><button class="btn btn-danger btn-sm" onclick="deleteConsultant(${c.id})"><span class="ms" style="font-size:16px">delete</span></button></td>`:''}
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+async function showAddConsultantModal() {
+  const branches = currentUser.role === 'admin' ? await get('/branches') : [{ id: currentUser.branch_id, name: currentUser.branch_name }];
+  const html = `<form class="space-y-4">
+    <div>
+      <label class="form-label">Branch *</label>
+      <div class="select-wrap"><select id="c-branch" class="form-input" required>
+        ${branches.map(b => `<option value="${b.id}" ${b.id===currentUser.branch_id?'selected':''}>${b.name}</option>`).join('')}
+      </select></div>
+    </div>
+    <div class="grid grid-cols-2 gap-3">
+      <div>
+        <label class="form-label">First Name *</label>
+        <input id="c-fname" class="form-input" required placeholder="First" />
+      </div>
+      <div>
+        <label class="form-label">Last Name *</label>
+        <input id="c-lname" class="form-input" required placeholder="Last" />
+      </div>
+    </div>
+    <div>
+      <label class="form-label">Employee ID *</label>
+      <input id="c-empid" class="form-input mono" required placeholder="FD-0001" pattern="FD-[0-9]{4}" title="Format: FD-0001" />
+    </div>
+    <div>
+      <label class="form-label">Consultant Type</label>
+      <div class="select-wrap"><select id="c-type" class="form-input">
+        <option>Showroom</option><option>Field</option>
+      </select></div>
+    </div>
+    <div class="flex gap-3 pt-2">
+      <button type="button" class="btn btn-outline" onclick="closeModal()">Cancel</button>
+      <button type="submit" class="btn btn-primary flex-1 justify-center">Add Consultant</button>
+    </div>
+  </form>`;
+  showModal('Add Sales Consultant', html, async () => {
+    try {
+      await post('/consultants', {
+        branch_id:   document.getElementById('c-branch').value,
+        employee_id: document.getElementById('c-empid').value,
+        first_name:  document.getElementById('c-fname').value,
+        last_name:   document.getElementById('c-lname').value,
+        type:        document.getElementById('c-type').value,
+      });
+      toast('Consultant added!'); closeModal(); loadConsultants();
+    } catch(err) { toast(err.message, 'error'); }
+  });
+}
+
+async function deleteConsultant(id) {
+  if (!confirm('Delete this consultant?')) return;
+  try { await del('/consultants/' + id); toast('Deleted'); loadConsultants(); }
+  catch(e) { toast(e.message, 'error'); }
+}
+
+// ════════════════════════════════════════════════════════
+//  Users
+// ════════════════════════════════════════════════════════
+async function loadUsers() {
+  try {
+    const users = await get('/users');
+    const el = document.getElementById('users-table-body');
+    el.innerHTML = `<table class="data-table">
+      <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Branch</th><th>Created</th><th></th></tr></thead>
+      <tbody>
+        ${users.map(u => `<tr>
+          <td class="font-medium text-on-surface">${u.name}</td>
+          <td class="mono" style="font-size:12px">${u.email}</td>
+          <td><span class="badge ${u.role==='admin'?'badge-amber':'badge-blue'}">${u.role}</span></td>
+          <td style="font-size:13px">${u.branch_name||'—'}</td>
+          <td style="font-size:12px;color:#9899a1">${(u.created_at||'').split('T')[0]}</td>
+          <td class="flex gap-2">
+            <button class="btn btn-outline btn-sm" onclick='showEditUserModal(${JSON.stringify(u)})'><span class="ms" style="font-size:16px">edit</span></button>
+            ${u.id!==currentUser.id?`<button class="btn btn-danger btn-sm" onclick="deleteUser(${u.id})"><span class="ms" style="font-size:16px">delete</span></button>`:''}
+          </td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+async function showAddUserModal() {
+  const branches = await get('/branches');
+  const html = `<form class="space-y-4">
+    <div><label class="form-label">Full Name *</label><input id="u-name" class="form-input" required placeholder="Jane Doe" /></div>
+    <div><label class="form-label">Email *</label><input id="u-email" type="email" class="form-input" required placeholder="jane@example.com" /></div>
+    <div><label class="form-label">Password *</label><input id="u-pass" type="password" class="form-input" required placeholder="Min 6 chars" minlength="6" /></div>
+    <div>
+      <label class="form-label">Role *</label>
+      <div class="select-wrap"><select id="u-role" class="form-input">
+        <option value="coordinator">Coordinator</option>
+        <option value="admin">Admin</option>
+      </select></div>
+    </div>
+    <div>
+      <label class="form-label">Branch</label>
+      <div class="select-wrap"><select id="u-branch" class="form-input">
+        <option value="">No branch</option>
+        ${branches.map(b => `<option value="${b.id}">${b.name}</option>`).join('')}
+      </select></div>
+    </div>
+    <div class="flex gap-3 pt-2">
+      <button type="button" class="btn btn-outline" onclick="closeModal()">Cancel</button>
+      <button type="submit" class="btn btn-primary flex-1 justify-center">Create User</button>
+    </div>
+  </form>`;
+  showModal('Add User', html, async () => {
+    try {
+      await post('/users', {
+        name:      document.getElementById('u-name').value,
+        email:     document.getElementById('u-email').value,
+        password:  document.getElementById('u-pass').value,
+        role:      document.getElementById('u-role').value,
+        branch_id: document.getElementById('u-branch').value || null,
+      });
+      toast('User created!'); closeModal(); loadUsers();
+    } catch(err) { toast(err.message, 'error'); }
+  });
+}
+
+async function showEditUserModal(u) {
+  const branches = await get('/branches');
+  const html = `<form class="space-y-4">
+    <div><label class="form-label">Full Name</label><input id="eu-name" class="form-input" value="${u.name}" /></div>
+    <div><label class="form-label">Email</label><input id="eu-email" type="email" class="form-input" value="${u.email}" /></div>
+    <div><label class="form-label">New Password <span style="color:#9899a1;font-weight:400">(leave blank to keep)</span></label><input id="eu-pass" type="password" class="form-input" placeholder="New password" /></div>
+    <div>
+      <label class="form-label">Role</label>
+      <div class="select-wrap"><select id="eu-role" class="form-input">
+        <option value="coordinator" ${u.role==='coordinator'?'selected':''}>Coordinator</option>
+        <option value="admin" ${u.role==='admin'?'selected':''}>Admin</option>
+      </select></div>
+    </div>
+    <div>
+      <label class="form-label">Branch</label>
+      <div class="select-wrap"><select id="eu-branch" class="form-input">
+        <option value="">No branch</option>
+        ${branches.map(b => `<option value="${b.id}" ${b.id===u.branch_id?'selected':''}>${b.name}</option>`).join('')}
+      </select></div>
+    </div>
+    <div class="flex gap-3 pt-2">
+      <button type="button" class="btn btn-outline" onclick="closeModal()">Cancel</button>
+      <button type="submit" class="btn btn-primary flex-1 justify-center">Save Changes</button>
+    </div>
+  </form>`;
+  showModal('Edit User', html, async () => {
+    try {
+      const pass = document.getElementById('eu-pass').value;
+      await put('/users/' + u.id, {
+        name:      document.getElementById('eu-name').value,
+        email:     document.getElementById('eu-email').value,
+        role:      document.getElementById('eu-role').value,
+        branch_id: document.getElementById('eu-branch').value || null,
+        ...(pass ? { password: pass } : {}),
+      });
+      toast('User updated!'); closeModal(); loadUsers();
+    } catch(err) { toast(err.message, 'error'); }
+  });
+}
+
+async function deleteUser(id) {
+  if (!confirm('Delete this user?')) return;
+  try { await del('/users/' + id); toast('User deleted'); loadUsers(); }
+  catch(e) { toast(e.message, 'error'); }
+}
+
+// ════════════════════════════════════════════════════════
+//  Models & Variants
+// ════════════════════════════════════════════════════════
+async function loadModels() {
+  try {
+    const models = await get('/models');
+    const el = document.getElementById('models-table-body');
+    if (!models.length) {
+      el.innerHTML = '<div class="p-6 text-sm text-on-surface-variant">No models yet. Click "Add Model".</div>';
+      document.getElementById('variants-table-body').innerHTML = '<div class="p-6 text-sm text-on-surface-variant">Select a model to view variants.</div>';
+      return;
+    }
+    el.innerHTML = `<table class="data-table">
+      <thead><tr><th>Brand</th><th>Model</th><th>Variants</th><th></th></tr></thead>
+      <tbody>
+        ${models.map(m => `<tr class="cursor-pointer" onclick="selectModel(${m.id},'${m.brand} ${m.name}')">
+          <td class="font-medium text-on-surface">${m.brand}</td>
+          <td>${m.name}</td>
+          <td><span class="badge badge-blue">${m.variant_count}</span></td>
+          <td class="flex gap-1">
+            <button class="btn btn-outline btn-sm" onclick="event.stopPropagation();showAddVariantModal(${m.id},'${m.brand} ${m.name}')">
+              <span class="ms" style="font-size:15px">add</span>
+            </button>
+            <button class="btn btn-danger btn-sm" onclick="event.stopPropagation();deleteModel(${m.id})">
+              <span class="ms" style="font-size:15px">delete</span>
+            </button>
+          </td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+    if (selectedModelId) loadVariants(selectedModelId);
+    else document.getElementById('variants-table-body').innerHTML = '<div class="p-6 text-sm text-on-surface-variant">Click a model to see its variants.</div>';
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+function selectModel(id, name) {
+  selectedModelId = id;
+  document.getElementById('variant-of-model').textContent = '— ' + name;
+  loadVariants(id);
+}
+
+async function loadVariants(modelId) {
+  try {
+    const variants = await get('/variants?model_id=' + modelId);
+    const el = document.getElementById('variants-table-body');
+    if (!variants.length) {
+      el.innerHTML = '<div class="p-6 text-sm text-on-surface-variant">No variants yet. Click + on the model.</div>';
+      return;
+    }
+    el.innerHTML = `<table class="data-table">
+      <thead><tr><th>Variant</th><th>Fuel</th><th>Trans.</th><th></th></tr></thead>
+      <tbody>
+        ${variants.map(v => `<tr>
+          <td class="font-medium text-on-surface">${v.name}</td>
+          <td>${v.fuel_type}</td>
+          <td>${v.transmission}</td>
+          <td><button class="btn btn-danger btn-sm" onclick="deleteVariant(${v.id})"><span class="ms" style="font-size:15px">delete</span></button></td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+async function showAddModelModal() {
+  showModal('Add Car Model', `<form class="space-y-4">
+    <div><label class="form-label">Brand *</label><input id="m-brand" class="form-input" required placeholder="Maruti Suzuki, Hyundai…" /></div>
+    <div><label class="form-label">Model Name *</label><input id="m-name" class="form-input" required placeholder="Swift, Creta…" /></div>
+    <div class="flex gap-3 pt-2">
+      <button type="button" class="btn btn-outline" onclick="closeModal()">Cancel</button>
+      <button type="submit" class="btn btn-primary flex-1 justify-center">Add Model</button>
+    </div>
+  </form>`, async () => {
+    try {
+      await post('/models', { brand: document.getElementById('m-brand').value, name: document.getElementById('m-name').value });
+      toast('Model added!'); closeModal(); loadModels();
+    } catch(err) { toast(err.message, 'error'); }
+  });
+}
+
+async function showAddVariantModal(modelId, modelName) {
+  showModal('Add Variant', `<form class="space-y-4">
+    <p class="text-sm text-on-surface-variant">Adding variant to <strong>${modelName}</strong></p>
+    <div><label class="form-label">Variant Name *</label><input id="v-name" class="form-input" required placeholder="LXi, VXi, ZXi…" /></div>
+    <div>
+      <label class="form-label">Fuel Type</label>
+      <div class="select-wrap"><select id="v-fuel" class="form-input"><option>Petrol</option><option>Diesel</option><option>CNG</option><option>Electric</option><option>Hybrid</option></select></div>
+    </div>
+    <div>
+      <label class="form-label">Transmission</label>
+      <div class="select-wrap"><select id="v-trans" class="form-input"><option>Manual</option><option>Automatic</option><option>AMT</option><option>CVT</option><option>DCT</option></select></div>
+    </div>
+    <div class="flex gap-3 pt-2">
+      <button type="button" class="btn btn-outline" onclick="closeModal()">Cancel</button>
+      <button type="submit" class="btn btn-primary flex-1 justify-center">Add Variant</button>
+    </div>
+  </form>`, async () => {
+    try {
+      await post('/variants', { model_id: modelId, name: document.getElementById('v-name').value, fuel_type: document.getElementById('v-fuel').value, transmission: document.getElementById('v-trans').value });
+      toast('Variant added!'); closeModal(); loadModels();
+    } catch(err) { toast(err.message, 'error'); }
+  });
+}
+
+async function deleteModel(id) {
+  if (!confirm('Delete this model and all variants?')) return;
+  try { await del('/models/' + id); toast('Deleted'); selectedModelId = null; loadModels(); }
+  catch(e) { toast(e.message, 'error'); }
+}
+async function deleteVariant(id) {
+  if (!confirm('Delete this variant?')) return;
+  try { await del('/variants/' + id); toast('Deleted'); if (selectedModelId) loadVariants(selectedModelId); }
+  catch(e) { toast(e.message, 'error'); }
+}
+
+// ════════════════════════════════════════════════════════
+//  Branches
+// ════════════════════════════════════════════════════════
+async function loadBranches() {
+  try {
+    const branches = await get('/branches');
+    const el = document.getElementById('branches-table-body');
+    el.innerHTML = `<table class="data-table">
+      <thead><tr><th>Branch Name</th><th></th></tr></thead>
+      <tbody>
+        ${branches.map(b => `<tr>
+          <td class="font-medium text-on-surface">${b.name}</td>
+          <td><button class="btn btn-danger btn-sm" onclick="deleteBranch(${b.id})"><span class="ms" style="font-size:15px">delete</span></button></td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+async function showAddBranchModal() {
+  showModal('Add Branch', `<form class="space-y-4">
+    <div><label class="form-label">Branch Name *</label><input id="br-name" class="form-input" required placeholder="e.g. East Showroom" /></div>
+    <div class="flex gap-3 pt-2">
+      <button type="button" class="btn btn-outline" onclick="closeModal()">Cancel</button>
+      <button type="submit" class="btn btn-primary flex-1 justify-center">Add Branch</button>
+    </div>
+  </form>`, async () => {
+    try {
+      await post('/branches', { name: document.getElementById('br-name').value });
+      toast('Branch added!'); closeModal(); loadBranches();
+    } catch(err) { toast(err.message, 'error'); }
+  });
+}
+
+async function deleteBranch(id) {
+  if (!confirm('Delete this branch?')) return;
+  try { await del('/branches/' + id); toast('Branch deleted'); loadBranches(); }
+  catch(e) { toast(e.message, 'error'); }
+}
+
+// ════════════════════════════════════════════════════════
+//  Bootstrap
+// ════════════════════════════════════════════════════════
+(async () => {
+  const token = localStorage.getItem('token');
+  if (!token) { document.getElementById('login-screen').classList.add('active'); return; }
+  try {
+    currentUser = await get('/auth/me');
+    boot();
+  } catch {
+    localStorage.removeItem('token');
+    document.getElementById('login-screen').classList.add('active');
+  }
+})();
+</script>
+</body>
+</html>

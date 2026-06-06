@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FleetDrive Pro | Coordinator Dashboard</title>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700&amp;family=Inter:wght@400;600;700&amp;family=JetBrains+Mono:wght@450&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        /* Custom scrollbar for data density */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c6c6cd;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #76777d;
+        }
+        .zebra-hover tr:hover {
+            background-color: rgba(49, 107, 243, 0.04);
+        }
+        .sticky-column {
+            position: sticky;
+            left: 0;
+            z-index: 10;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-secondary-container": "#fefcff",
+                      "on-tertiary-container": "#75859d",
+                      "on-primary": "#ffffff",
+                      "surface-container-lowest": "#ffffff",
+                      "error-container": "#ffdad6",
+                      "primary": "#000000",
+                      "on-primary-fixed-variant": "#3f465c",
+                      "primary-container": "#131b2e",
+                      "surface-dim": "#d8dadc",
+                      "inverse-on-surface": "#eff1f3",
+                      "tertiary-fixed": "#d3e4fe",
+                      "primary-fixed": "#dae2fd",
+                      "on-error-container": "#93000a",
+                      "surface-bright": "#f7f9fb",
+                      "inverse-primary": "#bec6e0",
+                      "primary-fixed-dim": "#bec6e0",
+                      "on-surface-variant": "#45464d",
+                      "on-tertiary": "#ffffff",
+                      "outline": "#76777d",
+                      "secondary-fixed": "#dbe1ff",
+                      "tertiary-fixed-dim": "#b7c8e1",
+                      "on-secondary-fixed": "#00174b",
+                      "on-surface": "#191c1e",
+                      "secondary-container": "#316bf3",
+                      "surface-variant": "#e0e3e5",
+                      "surface-tint": "#565e74",
+                      "outline-variant": "#c6c6cd",
+                      "on-secondary-fixed-variant": "#003ea8",
+                      "surface-container-low": "#f2f4f6",
+                      "on-primary-fixed": "#131b2e",
+                      "on-secondary": "#ffffff",
+                      "tertiary-container": "#0b1c30",
+                      "on-background": "#191c1e",
+                      "on-tertiary-fixed-variant": "#38485d",
+                      "secondary": "#0051d5",
+                      "on-tertiary-fixed": "#0b1c30",
+                      "on-primary-container": "#7c839b",
+                      "surface-container-highest": "#e0e3e5",
+                      "surface": "#f7f9fb",
+                      "inverse-surface": "#2d3133",
+                      "tertiary": "#000000",
+                      "on-error": "#ffffff",
+                      "surface-container-high": "#e6e8ea",
+                      "surface-container": "#eceef0",
+                      "error": "#ba1a1a",
+                      "secondary-fixed-dim": "#b4c5ff",
+                      "background": "#f7f9fb"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "stack-gap": "12px",
+                      "container-padding": "24px",
+                      "row-height-standard": "48px",
+                      "unit": "4px",
+                      "row-height-dense": "32px",
+                      "gutter": "16px"
+              },
+              "fontFamily": {
+                      "display-lg": ["Hanken Grotesk"],
+                      "label-caps": ["Inter"],
+                      "body-sm": ["Inter"],
+                      "headline-md": ["Hanken Grotesk"],
+                      "table-data": ["Inter"],
+                      "mono-data": ["JetBrains Mono"],
+                      "title-sm": ["Inter"],
+                      "body-md": ["Inter"]
+              },
+              "fontSize": {
+                      "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                      "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                      "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                      "table-data": ["13px", {"lineHeight": "16px", "fontWeight": "400"}],
+                      "mono-data": ["12px", {"lineHeight": "16px", "fontWeight": "450"}],
+                      "title-sm": ["16px", {"lineHeight": "24px", "fontWeight": "600"}],
+                      "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+              }
+            },
+          },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background font-body-md selection:bg-secondary-fixed selection:text-on-secondary-fixed overflow-hidden">
+<!-- SideNavBar (Shared Component) -->
+<aside class="fixed left-0 top-0 h-full w-[240px] z-40 bg-surface-container-lowest dark:bg-surface-container-highest border-r border-outline-variant dark:border-outline flex flex-col py-stack-gap h-full transition-all duration-200 ease-in-out">
+<div class="px-container-padding mb-8">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-primary flex items-center justify-center rounded-lg shadow-sm">
+<span class="material-symbols-outlined text-on-primary">speed</span>
+</div>
+<div>
+<h1 class="font-display-lg text-[20px] font-bold text-primary leading-tight">FleetDrive Pro</h1>
+<p class="font-label-caps text-[10px] text-on-surface-variant uppercase tracking-widest">Precision Management</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 px-3 space-y-1">
+<!-- Dashboard Active -->
+<a class="flex items-center gap-3 px-4 py-3 text-secondary dark:text-secondary-fixed-dim border-r-2 border-secondary dark:border-secondary-fixed-dim bg-surface-container-low dark:bg-surface-container-high transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-caps text-label-caps uppercase">Dashboard</span>
+</a>
+<!-- Nav Items -->
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant dark:text-surface-variant hover:text-on-surface dark:hover:text-on-surface-fixed hover:bg-surface-container dark:hover:bg-inverse-surface transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined">speed</span>
+<span class="font-label-caps text-label-caps uppercase">Add Test Drive</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant dark:text-surface-variant hover:text-on-surface dark:hover:text-on-surface-fixed hover:bg-surface-container dark:hover:bg-inverse-surface transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined">directions_car</span>
+<span class="font-label-caps text-label-caps uppercase">Vehicles</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant dark:text-surface-variant hover:text-on-surface dark:hover:text-on-surface-fixed hover:bg-surface-container dark:hover:bg-inverse-surface transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined">badge</span>
+<span class="font-label-caps text-label-caps uppercase">Sales Team</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant dark:text-surface-variant hover:text-on-surface dark:hover:text-on-surface-fixed hover:bg-surface-container dark:hover:bg-inverse-surface transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined">admin_panel_settings</span>
+<span class="font-label-caps text-label-caps uppercase">Admin Panel</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant dark:text-surface-variant hover:text-on-surface dark:hover:text-on-surface-fixed hover:bg-surface-container dark:hover:bg-inverse-surface transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-label-caps text-label-caps uppercase">Analytics</span>
+</a><a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant dark:text-surface-variant hover:text-on-surface dark:hover:text-on-surface-fixed hover:bg-surface-container dark:hover:bg-inverse-surface transition-all duration-200 ease-in-out" href="#"><span class="material-symbols-outlined">campaign</span><span class="font-label-caps text-label-caps uppercase">Marketing Activity</span></a>
+</nav>
+<div class="px-3 pt-4 border-t border-outline-variant space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container transition-all" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-caps text-label-caps uppercase">Settings</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-error hover:bg-error-container transition-all" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-label-caps text-label-caps uppercase">Logout</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Shell -->
+<main class="ml-[240px] h-screen flex flex-col overflow-hidden" style="opacity: 1; transition: opacity 0.4s ease-out;">
+<!-- TopNavBar (Shared Component) -->
+<header class="bg-surface-bright dark:bg-inverse-surface docked full-width top-0 sticky z-50 border-b border-outline-variant dark:border-outline flex justify-between items-center h-row-height-standard px-container-padding w-full flat no shadows">
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2 bg-surface-container-low px-3 py-1.5 rounded border border-outline-variant">
+<span class="material-symbols-outlined text-on-surface-variant text-[20px]">search</span>
+<input class="bg-transparent border-none focus:ring-0 font-body-sm w-64 text-on-surface placeholder-on-surface-variant" placeholder="Search Test Drives..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-primary hover:bg-surface-container-low transition-colors p-2 rounded cursor-pointer active:opacity-80">notifications</button>
+<button class="material-symbols-outlined text-primary hover:bg-surface-container-low transition-colors p-2 rounded cursor-pointer active:opacity-80">help</button>
+<div class="h-8 w-[1px] bg-outline-variant mx-2"></div>
+<div class="flex items-center gap-3">
+<span class="font-body-md font-bold text-primary">Admin Coordinator</span>
+<img alt="Administrator profile photo" class="w-8 h-8 rounded-full border border-outline-variant" data-alt="A professional headshot of a corporate administrator in a modern office setting. The person has a friendly but focused expression. The background is a brightly lit, high-end minimalist corporate environment with soft bokeh effects and a clean, light-mode color palette dominated by whites and soft greys." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDEz-JdFQvDxP_xGlOCIs1HL1mGcJwMbEQ2uFFn9Wsxf9PniOilsLHqw3WwdHYHcf6dbrTqaF1ewNeAc9XM3C_-BdEVwk_lzFQgwLnE8TLqKafnrfmv7sK6J6cSJEM8cFxKjcLCs5ywdPwyVpGOi8wGcSfRami4Hm0qICW5wdVa7Exza2GDnX0Q07lJtoCofMrayi_2QvgqldadtZj1Bgj1bllv4kalW7XMAIwbBK5LKRyO4cW8VGjnJU4mc08PLBbmvIrSQko40Ss"/>
+</div>
+</div>
+</header>
+<!-- Dashboard Content -->
+<div class="flex-1 overflow-y-auto p-container-padding space-y-6">
+<!-- Page Header Area -->
+<div class="flex justify-between items-end">
+<div class="space-y-1">
+<h2 class="font-headline-md text-headline-md text-primary tracking-tight">Test Drive Management</h2>
+<p class="font-body-sm text-on-surface-variant">Real-time oversight of all customer vehicle trials and staff assignments.</p>
+</div>
+<button class="bg-secondary text-on-secondary px-6 py-2.5 rounded font-title-sm flex items-center gap-2 hover:bg-secondary-container transition-all shadow-sm active:scale-95">
+<span class="material-symbols-outlined">add</span>
+                    Add Test Drive
+                </button>
+</div>
+<!-- Stats Bar (Bento-lite) -->
+<div class="grid grid-cols-4 gap-gutter">
+<div class="bg-white p-4 border border-outline-variant flex flex-col gap-1">
+<span class="font-label-caps text-on-surface-variant text-[10px] uppercase">Active Today</span>
+<span class="font-display-lg text-[24px]">14</span>
+<div class="flex items-center gap-1 text-green-600">
+<span class="material-symbols-outlined text-[16px]">trending_up</span>
+<span class="text-[12px] font-mono-data">+12% vs last week</span>
+</div>
+</div>
+<div class="bg-white p-4 border border-outline-variant flex flex-col gap-1">
+<span class="font-label-caps text-on-surface-variant text-[10px] uppercase">Pending Approval</span>
+<span class="font-display-lg text-[24px]">03</span>
+<div class="flex items-center gap-1 text-slate-500">
+<span class="material-symbols-outlined text-[16px]">schedule</span>
+<span class="text-[12px] font-mono-data">Action required</span>
+</div>
+</div>
+<div class="bg-white p-4 border border-outline-variant flex flex-col gap-1">
+<span class="font-label-caps text-on-surface-variant text-[10px] uppercase">Vehicles Out</span>
+<span class="font-display-lg text-[24px]">08</span>
+<div class="flex items-center gap-1 text-secondary">
+<span class="material-symbols-outlined text-[16px]">location_on</span>
+<span class="text-[12px] font-mono-data">Tracking active</span>
+</div>
+</div>
+<div class="bg-white p-4 border border-outline-variant flex flex-col gap-1">
+<span class="font-label-caps text-on-surface-variant text-[10px] uppercase">Fleet Status</span>
+<span class="font-display-lg text-[24px]">92%</span>
+<div class="flex items-center gap-1 text-green-600">
+<span class="material-symbols-outlined text-[16px]">check_circle</span>
+<span class="text-[12px] font-mono-data">Optimal efficiency</span>
+</div>
+</div>
+</div>
+<!-- Main Data Table Container -->
+<div class="bg-white border border-outline-variant flex flex-col">
+<!-- Table Toolbar -->
+<div class="px-4 py-3 border-b border-outline-variant flex justify-between items-center bg-surface-container-low/30">
+<div class="flex items-center gap-4">
+<span class="font-title-sm text-primary">Recent Test Drive Logs</span>
+<div class="flex gap-2">
+<button class="px-3 py-1 bg-white border border-outline-variant text-[12px] flex items-center gap-1 hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-[16px]">filter_list</span> Filter
+                            </button>
+<button class="px-3 py-1 bg-white border border-outline-variant text-[12px] flex items-center gap-1 hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-[16px]">download</span> Export
+                            </button>
+</div>
+</div>
+<span class="font-mono-data text-on-surface-variant">Showing 1-12 of 148 entries</span>
+</div>
+<!-- Excel-like Table -->
+<div class="overflow-x-auto">
+<table class="w-full border-collapse zebra-hover">
+<thead>
+<tr class="bg-surface-container-low/50">
+<th class="text-left font-label-caps text-on-surface-variant px-4 py-3 border-b border-outline-variant w-40">
+<div class="flex items-center gap-1 cursor-pointer">Date <span class="material-symbols-outlined text-[14px]">unfold_more</span></div>
+</th>
+<th class="text-left font-label-caps text-on-surface-variant px-4 py-3 border-b border-outline-variant">
+<div class="flex items-center gap-1 cursor-pointer">TD Slip ID <span class="material-symbols-outlined text-[14px]">unfold_more</span></div>
+</th>
+<th class="text-left font-label-caps text-on-surface-variant px-4 py-3 border-b border-outline-variant">
+<div class="flex items-center gap-1 cursor-pointer">Customer Name <span class="material-symbols-outlined text-[14px]">unfold_more</span></div>
+</th>
+<th class="text-left font-label-caps text-on-surface-variant px-4 py-3 border-b border-outline-variant">
+<div class="flex items-center gap-1 cursor-pointer">Consultant <span class="material-symbols-outlined text-[14px]">unfold_more</span></div>
+</th>
+<th class="text-left font-label-caps text-on-surface-variant px-4 py-3 border-b border-outline-variant">
+<div class="flex items-center gap-1 cursor-pointer">Vehicle <span class="material-symbols-outlined text-[14px]">unfold_more</span></div>
+</th>
+<th class="text-left font-label-caps text-on-surface-variant px-4 py-3 border-b border-outline-variant">Type</th>
+<th class="text-left font-label-caps text-on-surface-variant px-4 py-3 border-b border-outline-variant">Category</th>
+<th class="text-left font-label-caps text-on-surface-variant px-4 py-3 border-b border-outline-variant">Remarks</th>
+<th class="text-right font-label-caps text-on-surface-variant px-4 py-3 border-b border-outline-variant">Actions</th>
+</tr>
+</thead>
+<tbody class="font-table-data text-on-surface">
+<!-- Row 1: Active -->
+<tr class="border-b border-outline-variant group">
+<td class="px-4 py-3 font-mono-data">2023-11-24 14:30</td>
+<td class="px-4 py-3 font-mono-data text-secondary font-bold">SLP-9921</td>
+<td class="px-4 py-3 font-semibold">David Harrison</td>
+<td class="px-4 py-3">Sarah Jenkins</td>
+<td class="px-4 py-3">Model X Plaid - Black</td>
+<td class="px-4 py-3">Sales</td>
+<td class="px-4 py-3">
+<span class="bg-blue-100 text-blue-700 px-2 py-0.5 rounded-sm text-[11px] font-bold">Active</span>
+</td>
+<td class="px-4 py-3 text-on-surface-variant max-w-[200px] truncate">Short loop route through downtown...</td>
+<td class="px-4 py-3 text-right">
+<div class="opacity-0 group-hover:opacity-100 transition-opacity flex justify-end gap-2">
+<button class="material-symbols-outlined text-secondary text-[18px]">visibility</button>
+<button class="material-symbols-outlined text-on-surface-variant text-[18px]">edit</button>
+</div>
+</td>
+</tr>
+<!-- Row 2: Completed -->
+<tr class="border-b border-outline-variant group">
+<td class="px-4 py-3 font-mono-data">2023-11-24 13:15</td>
+<td class="px-4 py-3 font-mono-data text-secondary font-bold">SLP-9920</td>
+<td class="px-4 py-3 font-semibold">Elena Rodriguez</td>
+<td class="px-4 py-3">Marcus Thorne</td>
+<td class="px-4 py-3">Rivian R1S - Launch Ed.</td>
+<td class="px-4 py-3">VIP</td>
+<td class="px-4 py-3">
+<span class="bg-green-100 text-green-700 px-2 py-0.5 rounded-sm text-[11px] font-bold">Completed</span>
+</td>
+<td class="px-4 py-3 text-on-surface-variant max-w-[200px] truncate">Client highly impressed with cabin noise.</td>
+<td class="px-4 py-3 text-right">
+<div class="opacity-0 group-hover:opacity-100 transition-opacity flex justify-end gap-2">
+<button class="material-symbols-outlined text-secondary text-[18px]">visibility</button>
+<button class="material-symbols-outlined text-on-surface-variant text-[18px]">print</button>
+</div>
+</td>
+</tr>
+<!-- Row 3: Pending -->
+<tr class="border-b border-outline-variant group">
+<td class="px-4 py-3 font-mono-data">2023-11-24 16:00</td>
+<td class="px-4 py-3 font-mono-data text-secondary font-bold">SLP-9923</td>
+<td class="px-4 py-3 font-semibold">Jonathan Wu</td>
+<td class="px-4 py-3">Sarah Jenkins</td>
+<td class="px-4 py-3">BMW i7 M70 - Oxide Grey</td>
+<td class="px-4 py-3">Demo</td>
+<td class="px-4 py-3">
+<span class="bg-slate-100 text-slate-700 px-2 py-0.5 rounded-sm text-[11px] font-bold">Pending</span>
+</td>
+<td class="px-4 py-3 text-on-surface-variant max-w-[200px] truncate">Waiting for vehicle cleaning.</td>
+<td class="px-4 py-3 text-right">
+<div class="opacity-0 group-hover:opacity-100 transition-opacity flex justify-end gap-2">
+<button class="material-symbols-outlined text-secondary text-[18px]">play_circle</button>
+<button class="material-symbols-outlined text-on-surface-variant text-[18px]">edit</button>
+</div>
+</td>
+</tr>
+<!-- Row 4: Issue -->
+<tr class="border-b border-outline-variant group">
+<td class="px-4 py-3 font-mono-data">2023-11-24 11:00</td>
+<td class="px-4 py-3 font-mono-data text-secondary font-bold">SLP-9918</td>
+<td class="px-4 py-3 font-semibold">Robert Chen</td>
+<td class="px-4 py-3">Marcus Thorne</td>
+<td class="px-4 py-3">Lucid Air Sapphire</td>
+<td class="px-4 py-3">Sales</td>
+<td class="px-4 py-3">
+<span class="bg-red-100 text-red-700 px-2 py-0.5 rounded-sm text-[11px] font-bold">Issue</span>
+</td>
+<td class="px-4 py-3 text-on-surface-variant max-w-[200px] truncate text-error font-semibold">Returned with flat tire.</td>
+<td class="px-4 py-3 text-right">
+<div class="opacity-0 group-hover:opacity-100 transition-opacity flex justify-end gap-2">
+<button class="material-symbols-outlined text-error text-[18px]">warning</button>
+<button class="material-symbols-outlined text-on-surface-variant text-[18px]">edit</button>
+</div>
+</td>
+</tr>
+<!-- Generic Row Filling for density -->
+<tr class="border-b border-outline-variant group">
+<td class="px-4 py-3 font-mono-data">2023-11-24 10:30</td>
+<td class="px-4 py-3 font-mono-data text-secondary font-bold">SLP-9917</td>
+<td class="px-4 py-3 font-semibold">Sarah Miller</td>
+<td class="px-4 py-3">Jameson Lee</td>
+<td class="px-4 py-3">Audi e-tron GT</td>
+<td class="px-4 py-3">Internal</td>
+<td class="px-4 py-3">
+<span class="bg-green-100 text-green-700 px-2 py-0.5 rounded-sm text-[11px] font-bold">Completed</span>
+</td>
+<td class="px-4 py-3 text-on-surface-variant max-w-[200px] truncate">-</td>
+<td class="px-4 py-3 text-right">
+<div class="opacity-0 group-hover:opacity-100 transition-opacity flex justify-end gap-2">
+<button class="material-symbols-outlined text-on-surface-variant text-[18px]">visibility</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination Footer -->
+<div class="px-4 py-3 flex justify-between items-center border-t border-outline-variant bg-surface-container-low/20">
+<div class="flex items-center gap-2">
+<span class="text-body-sm text-on-surface-variant">Rows per page:</span>
+<select class="bg-white border border-outline-variant rounded px-1 py-0.5 text-body-sm focus:ring-secondary">
+<option>10</option>
+<option selected="">25</option>
+<option>50</option>
+</select>
+</div>
+<div class="flex items-center gap-4">
+<span class="text-body-sm font-mono-data">1 - 10 of 148</span>
+<div class="flex gap-1">
+<button class="p-1 rounded hover:bg-surface-container transition-colors disabled:opacity-30" disabled="">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<button class="p-1 rounded hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Contextual Footer (Bento Area) -->
+<div class="grid grid-cols-3 gap-gutter pb-8">
+<div class="col-span-2 bg-surface-container-low border border-outline-variant p-4 flex gap-6 items-center">
+<div class="bg-white p-3 border border-outline-variant rounded">
+<span class="material-symbols-outlined text-secondary text-[32px]">directions_car</span>
+</div>
+<div class="flex-1 space-y-1">
+<h4 class="font-title-sm">Fleet Maintenance Reminder</h4>
+<p class="text-body-sm text-on-surface-variant">3 vehicles are due for routine maintenance checks today to maintain TD safety standards.</p>
+</div>
+<button class="border border-secondary text-secondary px-4 py-2 rounded font-label-caps uppercase hover:bg-secondary hover:text-on-secondary transition-all">View Schedule</button>
+</div>
+<div class="bg-primary text-on-primary p-4 rounded-sm flex flex-col justify-between">
+<div class="flex justify-between items-start">
+<span class="font-label-caps uppercase text-[10px] opacity-70">Coordinator Tip</span>
+<span class="material-symbols-outlined opacity-50">lightbulb</span>
+</div>
+<p class="text-body-sm font-semibold">Keyboard Shortcut: Press <kbd class="bg-on-primary-container text-white px-1.5 py-0.5 rounded text-[10px]">Ctrl + N</kbd> to quickly add a new test drive entry.</p>
+</div>
+</div>
+</div>
+</main>
+<!-- FAB Overlay (Primary Intent Only) -->
+<button class="fixed bottom-8 right-8 w-14 h-14 bg-secondary text-on-secondary rounded-full shadow-lg flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-50 group">
+<span class="material-symbols-outlined text-[28px]">speed</span>
+<span class="absolute right-16 bg-primary text-white px-3 py-1.5 rounded text-sm whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">New Entry</span>
+</button>
+<script>
+        // Micro-interactions for table sorting feedback
+        document.querySelectorAll('th div.cursor-pointer').forEach(header => {
+            header.addEventListener('click', () => {
+                const icon = header.querySelector('.material-symbols-outlined');
+                if (icon.textContent === 'unfold_more') {
+                    icon.textContent = 'expand_more';
+                    header.classList.add('text-secondary');
+                } else if (icon.textContent === 'expand_more') {
+                    icon.textContent = 'expand_less';
+                } else {
+                    icon.textContent = 'unfold_more';
+                    header.classList.remove('text-secondary');
+                }
+            });
+        });
+
+        // Add a simple fade-in effect for the dashboard
+        document.addEventListener('DOMContentLoaded', () => {
+            const main = document.querySelector('main');
+            main.style.opacity = '0';
+            main.style.transition = 'opacity 0.4s ease-out';
+            setTimeout(() => {
+                main.style.opacity = '1';
+            }, 50);
+        });
+    </script>
+</body></html>

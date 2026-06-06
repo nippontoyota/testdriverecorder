@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FleetDrive Pro - Register New Vehicle</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700&amp;family=Inter:wght@400;600;700&amp;family=JetBrains+Mono:wght@450&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-secondary-container": "#fefcff",
+                    "on-tertiary-container": "#75859d",
+                    "on-primary": "#ffffff",
+                    "surface-container-lowest": "#ffffff",
+                    "error-container": "#ffdad6",
+                    "primary": "#000000",
+                    "on-primary-fixed-variant": "#3f465c",
+                    "primary-container": "#131b2e",
+                    "surface-dim": "#d8dadc",
+                    "inverse-on-surface": "#eff1f3",
+                    "tertiary-fixed": "#d3e4fe",
+                    "primary-fixed": "#dae2fd",
+                    "on-error-container": "#93000a",
+                    "surface-bright": "#f7f9fb",
+                    "inverse-primary": "#bec6e0",
+                    "primary-fixed-dim": "#bec6e0",
+                    "on-surface-variant": "#45464d",
+                    "on-tertiary": "#ffffff",
+                    "outline": "#76777d",
+                    "secondary-fixed": "#dbe1ff",
+                    "tertiary-fixed-dim": "#b7c8e1",
+                    "on-secondary-fixed": "#00174b",
+                    "on-surface": "#191c1e",
+                    "secondary-container": "#316bf3",
+                    "surface-variant": "#e0e3e5",
+                    "surface-tint": "#565e74",
+                    "outline-variant": "#c6c6cd",
+                    "on-secondary-fixed-variant": "#003ea8",
+                    "surface-container-low": "#f2f4f6",
+                    "on-primary-fixed": "#131b2e",
+                    "on-secondary": "#ffffff",
+                    "tertiary-container": "#0b1c30",
+                    "on-background": "#191c1e",
+                    "on-tertiary-fixed-variant": "#38485d",
+                    "secondary": "#0051d5",
+                    "on-tertiary-fixed": "#0b1c30",
+                    "on-primary-container": "#7c839b",
+                    "surface-container-highest": "#e0e3e5",
+                    "surface": "#f7f9fb",
+                    "inverse-surface": "#2d3133",
+                    "tertiary": "#000000",
+                    "on-error": "#ffffff",
+                    "surface-container-high": "#e6e8ea",
+                    "surface-container": "#eceef0",
+                    "error": "#ba1a1a",
+                    "secondary-fixed-dim": "#b4c5ff",
+                    "background": "#f7f9fb"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "stack-gap": "12px",
+                    "container-padding": "24px",
+                    "row-height-standard": "48px",
+                    "unit": "4px",
+                    "row-height-dense": "32px",
+                    "gutter": "16px"
+            },
+            "fontFamily": {
+                    "display-lg": ["Hanken Grotesk"],
+                    "label-caps": ["Inter"],
+                    "body-sm": ["Inter"],
+                    "headline-md": ["Hanken Grotesk"],
+                    "table-data": ["Inter"],
+                    "mono-data": ["JetBrains Mono"],
+                    "title-sm": ["Inter"],
+                    "body-md": ["Inter"]
+            },
+            "fontSize": {
+                    "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                    "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "table-data": ["13px", {"lineHeight": "16px", "fontWeight": "400"}],
+                    "mono-data": ["12px", {"lineHeight": "16px", "fontWeight": "450"}],
+                    "title-sm": ["16px", {"lineHeight": "24px", "fontWeight": "600"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface">
+<div class="flex min-h-screen">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-full w-[240px] z-40 bg-surface-container-lowest border-r border-outline-variant flex flex-col py-stack-gap">
+<div class="px-container-padding mb-8">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-primary flex items-center justify-center rounded">
+<span class="material-symbols-outlined text-on-primary">inventory</span>
+</div>
+<div>
+<h1 class="font-display-lg text-display-lg font-bold text-primary leading-tight">FleetDrive Pro</h1>
+<p class="font-label-caps text-label-caps text-on-surface-variant opacity-70">Precision Fleet Management</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 space-y-1">
+<!-- Dashboard -->
+<a class="flex items-center px-container-padding py-3 font-label-caps text-label-caps text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all duration-200" href="#">
+<span class="material-symbols-outlined mr-3">dashboard</span>
+                    Dashboard
+                </a>
+<!-- Add Test Drive -->
+<a class="flex items-center px-container-padding py-3 font-label-caps text-label-caps text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all duration-200" href="#">
+<span class="material-symbols-outlined mr-3">speed</span>
+                    Add Test Drive
+                </a>
+<!-- Vehicles - Active State -->
+<a class="flex items-center px-container-padding py-3 font-label-caps text-label-caps text-secondary border-r-2 border-secondary bg-surface-container-low transition-all duration-200" href="#">
+<span class="material-symbols-outlined mr-3">directions_car</span>
+                    Vehicles
+                </a>
+<!-- Sales Team -->
+<a class="flex items-center px-container-padding py-3 font-label-caps text-label-caps text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all duration-200" href="#">
+<span class="material-symbols-outlined mr-3">badge</span>
+                    Sales Team
+                </a>
+<!-- Admin Panel -->
+<a class="flex items-center px-container-padding py-3 font-label-caps text-label-caps text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all duration-200" href="#">
+<span class="material-symbols-outlined mr-3">admin_panel_settings</span>
+                    Admin Panel
+                </a>
+<!-- Analytics -->
+<a class="flex items-center px-container-padding py-3 font-label-caps text-label-caps text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all duration-200" href="#">
+<span class="material-symbols-outlined mr-3">analytics</span>
+                    Analytics
+                </a>
+</nav>
+<div class="px-container-padding mb-6">
+<button class="w-full bg-primary text-on-primary py-3 rounded-lg font-title-sm text-title-sm hover:opacity-90 transition-opacity">
+                    New Entry
+                </button>
+</div>
+<div class="mt-auto border-t border-outline-variant pt-stack-gap pb-6">
+<a class="flex items-center px-container-padding py-2 font-label-caps text-label-caps text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all" href="#">
+<span class="material-symbols-outlined mr-3">settings</span>
+                    Settings
+                </a>
+<a class="flex items-center px-container-padding py-2 font-label-caps text-label-caps text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all" href="#">
+<span class="material-symbols-outlined mr-3">logout</span>
+                    Logout
+                </a>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="ml-[240px] flex-1 flex flex-col">
+<!-- TopNavBar -->
+<header class="h-row-height-standard px-container-padding bg-surface-bright sticky top-0 z-50 flex justify-between items-center border-b border-outline-variant">
+<div class="flex items-center gap-4">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">search</span>
+<input class="pl-9 pr-4 py-1.5 bg-surface-container-low border-none rounded-full text-body-md focus:ring-2 focus:ring-secondary/20 w-64 transition-all" placeholder="Quick search inventory..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 hover:bg-surface-container-low transition-colors rounded-full relative">
+<span class="material-symbols-outlined text-primary">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full border-2 border-surface-bright"></span>
+</button>
+<button class="p-2 hover:bg-surface-container-low transition-colors rounded-full">
+<span class="material-symbols-outlined text-primary">help</span>
+</button>
+<div class="h-8 w-px bg-outline-variant mx-1"></div>
+<div class="flex items-center gap-3 cursor-pointer group">
+<div class="text-right">
+<p class="font-title-sm text-title-sm leading-none">Admin User</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant opacity-70">Fleet Director</p>
+</div>
+<img alt="Administrator profile photo" class="w-8 h-8 rounded-full border border-outline-variant group-hover:border-secondary transition-colors" data-alt="A professional corporate headshot of a middle-aged male administrator with a confident expression. He is wearing a dark, tailored suit and a crisp white shirt, set against a clean, softly lit office background with modern architectural details. The lighting is bright and high-key, reflecting a minimalist and efficient corporate aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC3yJY9kbnAgImckLFc2pJYGKJYpu9EveUw8pE3tmAe45D6BTG64TY45zmGNDvSQIEFSJObOc5DxEVLxeHRKLFKayOrcKEAvqcOPAoisNJx6LG75oJo1i8zSl-z7X_c1mALG5pjg9gsX0kHBTuYLNTswtnBa3VLsClUypwnEm1GWLM6NW-0pPQCmk80k_z1Cwq4iXbIaoTIqBtE9XDkIsoOdxDQusynisqm2MZu3T_X9m45Ruvgk0sat6dv3X0_iVsYG-rnnaS4D_M"/>
+</div>
+</div>
+</header>
+<!-- Page Content -->
+<div class="p-container-padding max-w-5xl mx-auto w-full">
+<!-- Header Section -->
+<div class="mb-10 flex justify-between items-end">
+<div>
+<div class="flex items-center gap-2 mb-2">
+<span class="font-label-caps text-label-caps text-secondary bg-secondary-fixed px-2 py-0.5 rounded">INVENTORY MANAGEMENT</span>
+</div>
+<h2 class="font-display-lg text-display-lg text-primary">Register New Vehicle</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Onboard a new vehicle to the FleetDrive Pro ecosystem with full documentation.</p>
+</div>
+<div class="flex gap-3">
+<button class="px-6 py-2 border border-outline text-on-surface font-title-sm text-title-sm rounded-lg hover:bg-surface-container transition-colors">
+                            Save Draft
+                        </button>
+<button class="px-6 py-2 bg-secondary text-on-secondary font-title-sm text-title-sm rounded-lg hover:brightness-110 shadow-sm transition-all">
+                            Complete Registration
+                        </button>
+</div>
+</div>
+<!-- Registration Form -->
+<div class="grid grid-cols-12 gap-8">
+<!-- Left Column: Primary Details -->
+<div class="col-span-12 lg:col-span-8">
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-8 shadow-sm">
+<div class="flex items-center gap-2 mb-6 text-primary">
+<span class="material-symbols-outlined">description</span>
+<h3 class="font-headline-md text-headline-md">Vehicle Specifications</h3>
+</div>
+<form class="space-y-6">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<!-- Model Dropdown -->
+<div class="space-y-2">
+<label class="font-title-sm text-title-sm text-on-surface block">Vehicle Model</label>
+<div class="relative">
+<select class="w-full h-11 pl-4 pr-10 border border-outline-variant rounded-lg bg-surface appearance-none focus:ring-2 focus:ring-secondary/20 focus:border-secondary transition-all font-body-md">
+<option disabled="" selected="" value="">Select Model</option>
+<option value="sedan">Lumina X Sedan</option>
+<option value="suv">Apex GT SUV</option>
+<option value="electric">Vortex EV</option>
+<option value="compact">Nano City</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">expand_more</span>
+</div>
+</div>
+<!-- Variant Dropdown -->
+<div class="space-y-2">
+<label class="font-title-sm text-title-sm text-on-surface block">Variant</label>
+<div class="relative">
+<select class="w-full h-11 pl-4 pr-10 border border-outline-variant rounded-lg bg-surface appearance-none focus:ring-2 focus:ring-secondary/20 focus:border-secondary transition-all font-body-md">
+<option disabled="" selected="" value="">Select Variant</option>
+<option value="base">Standard Comfort</option>
+<option value="luxury">Luxury Trim</option>
+<option value="performance">Performance Sport</option>
+<option value="platinum">Platinum Executive</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">expand_more</span>
+</div>
+</div>
+<!-- Colour Dropdown -->
+<div class="space-y-2">
+<label class="font-title-sm text-title-sm text-on-surface block">Exterior Colour</label>
+<div class="relative">
+<select class="w-full h-11 pl-4 pr-10 border border-outline-variant rounded-lg bg-surface appearance-none focus:ring-2 focus:ring-secondary/20 focus:border-secondary transition-all font-body-md">
+<option disabled="" selected="" value="">Select Colour</option>
+<option value="obsidian">Obsidian Black</option>
+<option value="arctic">Arctic White</option>
+<option value="midnight">Midnight Blue</option>
+<option value="slate">Slate Metallic</option>
+<option value="crimson">Crimson Pearl</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">expand_more</span>
+</div>
+</div>
+<!-- Regd. No Text Input -->
+<div class="space-y-2">
+<label class="font-title-sm text-title-sm text-on-surface block">Registration Number</label>
+<input class="w-full h-11 px-4 border border-outline-variant rounded-lg bg-surface focus:ring-2 focus:ring-secondary/20 focus:border-secondary transition-all font-mono-data text-mono-data uppercase" placeholder="e.g. ABC 1234" type="text"/>
+<p class="font-body-sm text-body-sm text-on-surface-variant opacity-60">Enter the alphanumeric license plate number.</p>
+</div>
+</div>
+<div class="pt-4 border-t border-outline-variant mt-6">
+<div class="space-y-2">
+<label class="font-title-sm text-title-sm text-on-surface block">Additional Equipment Notes</label>
+<textarea class="w-full p-4 border border-outline-variant rounded-lg bg-surface focus:ring-2 focus:ring-secondary/20 focus:border-secondary transition-all font-body-md" placeholder="List any non-standard modifications or accessories..." rows="4"></textarea>
+</div>
+</div>
+</form>
+</div>
+</div>
+<!-- Right Column: Context/Help -->
+<div class="col-span-12 lg:col-span-4 space-y-gutter">
+<!-- Preview Card -->
+<div class="bg-primary rounded-xl p-6 text-on-primary overflow-hidden relative">
+<div class="relative z-10">
+<h4 class="font-title-sm text-title-sm mb-4 opacity-80">LIVE PREVIEW</h4>
+<div class="aspect-video w-full rounded-lg bg-surface-container-highest/20 flex items-center justify-center mb-4">
+<span class="material-symbols-outlined text-5xl opacity-40">directions_car</span>
+</div>
+<div class="space-y-2">
+<div class="h-2 w-2/3 bg-white/20 rounded"></div>
+<div class="h-2 w-1/2 bg-white/10 rounded"></div>
+</div>
+</div>
+<!-- Background accent -->
+<div class="absolute -right-10 -bottom-10 w-40 h-40 bg-secondary/20 rounded-full blur-3xl"></div>
+</div>
+<!-- Info Card -->
+<div class="bg-surface-container-low border border-outline-variant rounded-xl p-6">
+<h4 class="font-title-sm text-title-sm text-primary flex items-center gap-2 mb-4">
+<span class="material-symbols-outlined text-secondary">info</span>
+                                Compliance Check
+                            </h4>
+<ul class="space-y-3">
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-green-500 text-sm mt-0.5">check_circle</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant">VIN verification automatically triggered on registration.</p>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-green-500 text-sm mt-0.5">check_circle</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Standard manufacturer warranties will be applied by default.</p>
+</li>
+<li class="flex items-start gap-3 opacity-50">
+<span class="material-symbols-outlined text-on-surface-variant text-sm mt-0.5">circle</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Insurance documentation upload required in next step.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- Micro-interaction Script -->
+<script>
+        // Simple interactivity for visual feedback
+        const inputs = document.querySelectorAll('input, select, textarea');
+        inputs.forEach(input => {
+            input.addEventListener('focus', () => {
+                input.parentElement.closest('div').classList.add('scale-[1.01]');
+            });
+            input.addEventListener('blur', () => {
+                input.parentElement.closest('div').classList.remove('scale-[1.01]');
+            });
+        });
+    </script>
+</body></html>

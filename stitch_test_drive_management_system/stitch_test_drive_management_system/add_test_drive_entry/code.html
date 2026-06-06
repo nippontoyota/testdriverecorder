@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FleetDrive Pro | Add Test Drive</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700&amp;family=Inter:wght@400;600;700&amp;family=JetBrains+Mono:wght@450&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f9fb;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #e2e8f0;
+            border-radius: 10px;
+        }
+    </style>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-secondary-container": "#fefcff",
+                    "on-tertiary-container": "#75859d",
+                    "on-primary": "#ffffff",
+                    "surface-container-lowest": "#ffffff",
+                    "error-container": "#ffdad6",
+                    "primary": "#000000",
+                    "on-primary-fixed-variant": "#3f465c",
+                    "primary-container": "#131b2e",
+                    "surface-dim": "#d8dadc",
+                    "inverse-on-surface": "#eff1f3",
+                    "tertiary-fixed": "#d3e4fe",
+                    "primary-fixed": "#dae2fd",
+                    "on-error-container": "#93000a",
+                    "surface-bright": "#f7f9fb",
+                    "inverse-primary": "#bec6e0",
+                    "primary-fixed-dim": "#bec6e0",
+                    "on-surface-variant": "#45464d",
+                    "on-tertiary": "#ffffff",
+                    "outline": "#76777d",
+                    "secondary-fixed": "#dbe1ff",
+                    "tertiary-fixed": "#d3e4fe",
+                    "on-secondary-fixed": "#00174b",
+                    "on-surface": "#191c1e",
+                    "secondary-container": "#316bf3",
+                    "surface-variant": "#e0e3e5",
+                    "surface-tint": "#565e74",
+                    "outline-variant": "#c6c6cd",
+                    "on-secondary-fixed-variant": "#003ea8",
+                    "surface-container-low": "#f2f4f6",
+                    "on-primary-fixed": "#131b2e",
+                    "on-secondary": "#ffffff",
+                    "tertiary-container": "#0b1c30",
+                    "on-background": "#191c1e",
+                    "on-tertiary-fixed-variant": "#38485d",
+                    "secondary": "#0051d5",
+                    "on-tertiary-fixed": "#0b1c30",
+                    "on-primary-container": "#7c839b",
+                    "surface-container-highest": "#e0e3e5",
+                    "surface": "#f7f9fb",
+                    "inverse-surface": "#2d3133",
+                    "tertiary": "#000000",
+                    "on-error": "#ffffff",
+                    "surface-container-high": "#e6e8ea",
+                    "surface-container": "#eceef0",
+                    "error": "#ba1a1a",
+                    "secondary-fixed-dim": "#b4c5ff",
+                    "background": "#f7f9fb"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "stack-gap": "12px",
+                    "container-padding": "24px",
+                    "row-height-standard": "48px",
+                    "unit": "4px",
+                    "row-height-dense": "32px",
+                    "gutter": "16px"
+            },
+            "fontFamily": {
+                    "display-lg": ["Hanken Grotesk"],
+                    "label-caps": ["Inter"],
+                    "body-sm": ["Inter"],
+                    "headline-md": ["Hanken Grotesk"],
+                    "table-data": ["Inter"],
+                    "mono-data": ["JetBrains Mono"],
+                    "title-sm": ["Inter"],
+                    "body-md": ["Inter"]
+            },
+            "fontSize": {
+                    "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                    "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "table-data": ["13px", {"lineHeight": "16px", "fontWeight": "400"}],
+                    "mono-data": ["12px", {"lineHeight": "16px", "fontWeight": "450"}],
+                    "title-sm": ["16px", {"lineHeight": "24px", "fontWeight": "600"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+</head>
+<body class="bg-background text-on-surface overflow-hidden">
+<!-- Sidebar Navigation -->
+<aside class="fixed left-0 top-0 h-full w-[240px] z-40 bg-surface-container-lowest border-r border-outline-variant flex flex-col py-stack-gap">
+<div class="px-container-padding mb-8">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-primary rounded flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary">speed</span>
+</div>
+<div>
+<h1 class="font-display-lg text-display-lg font-bold text-primary leading-tight">FleetDrive Pro</h1>
+<p class="font-label-caps text-[10px] text-on-surface-variant uppercase tracking-wider">Precision Fleet Management</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 px-3 space-y-1 overflow-y-auto custom-scrollbar">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded transition-all duration-200 text-on-surface-variant hover:bg-surface-container hover:text-on-surface" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-caps text-label-caps uppercase">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded transition-all duration-200 text-secondary border-r-2 border-secondary bg-surface-container-low font-bold" href="#">
+<span class="material-symbols-outlined">speed</span>
+<span class="font-label-caps text-label-caps uppercase">Add Test Drive</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded transition-all duration-200 text-on-surface-variant hover:bg-surface-container hover:text-on-surface" href="#">
+<span class="material-symbols-outlined">directions_car</span>
+<span class="font-label-caps text-label-caps uppercase">Vehicles</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded transition-all duration-200 text-on-surface-variant hover:bg-surface-container hover:text-on-surface" href="#">
+<span class="material-symbols-outlined">badge</span>
+<span class="font-label-caps text-label-caps uppercase">Sales Team</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded transition-all duration-200 text-on-surface-variant hover:bg-surface-container hover:text-on-surface" href="#">
+<span class="material-symbols-outlined">admin_panel_settings</span>
+<span class="font-label-caps text-label-caps uppercase">Admin Panel</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded transition-all duration-200 text-on-surface-variant hover:bg-surface-container hover:text-on-surface" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-label-caps text-label-caps uppercase">Analytics</span>
+</a>
+</nav>
+<div class="px-3 mt-auto pt-4 border-t border-outline-variant flex flex-col gap-1">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded transition-all duration-200 text-on-surface-variant hover:bg-surface-container" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-caps text-label-caps uppercase">Settings</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded transition-all duration-200 text-on-surface-variant hover:bg-surface-container" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-label-caps text-label-caps uppercase">Logout</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-[240px] min-h-screen flex flex-col">
+<!-- Top Navbar -->
+<header class="bg-surface-bright sticky top-0 z-50 border-b border-outline-variant h-row-height-standard px-container-padding flex justify-between items-center w-full">
+<div class="flex items-center gap-4">
+<span class="font-headline-md text-headline-md text-primary">New Test Drive Entry</span>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative flex items-center bg-surface-container-low px-3 py-1.5 rounded-lg border border-outline-variant">
+<span class="material-symbols-outlined text-on-surface-variant text-lg">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-body-sm w-48 placeholder:text-on-surface-variant" placeholder="Search entries..." type="text"/>
+</div>
+<div class="flex items-center gap-3 text-on-surface-variant">
+<button class="hover:bg-surface-container-low p-2 rounded-full transition-colors cursor-pointer">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="hover:bg-surface-container-low p-2 rounded-full transition-colors cursor-pointer">
+<span class="material-symbols-outlined">help</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-surface-container-highest overflow-hidden border border-outline-variant">
+<img alt="Administrator profile photo" class="w-full h-full object-cover" data-alt="A professional headshot of a corporate fleet administrator in a clean modern office. The lighting is soft and natural, emphasizing a professional and focused atmosphere. The background is slightly blurred with minimalist office furniture. The overall aesthetic is clean, light-mode, and corporate with a focus on reliability and precision." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCpHwFofx-3jP5EeE1gE9SvtNVfzDyvpllolPU6o4CnVsrT9brxG47i_U35jhea0NdBrz2-cx5vkWw9cGlF2k0cQ53X2lkXqvbQNydjvY2KBt1ldpelIcoFjiKYndkjnH-S2Sap2k6DitiRdvXTNBHnqGIr909t7i6hIh8m93-H9frvPpVIrLrmRtQ5iWgZlkBnbNbKZyFCNmB1bAHCg51tIdRxJNaIgaKXwvz0X9tLF6Q0fYTAz4GCvT9P7nq8ocDZibDHy7JbOL4"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Content Canvas -->
+<div class="flex-1 p-container-padding overflow-y-auto custom-scrollbar">
+<div class="max-w-5xl mx-auto space-y-gutter">
+<!-- Page Breadcrumbs/Meta -->
+<div class="flex items-center gap-2 text-on-surface-variant font-body-sm mb-2">
+<span class="hover:text-primary cursor-pointer">Operations</span>
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+<span class="hover:text-primary cursor-pointer">Test Drives</span>
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+<span class="text-primary font-semibold">New Entry</span>
+</div>
+<!-- Form Card -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded-lg p-8 shadow-sm">
+<form class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
+<!-- Row 1: Date and Slip ID -->
+<div class="space-y-2">
+<label class="block font-label-caps text-label-caps uppercase text-on-surface-variant">Test Drive Date</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">calendar_today</span>
+<input class="w-full pl-10 pr-4 py-2.5 bg-surface-bright border border-outline-variant rounded-lg focus:ring-2 focus:ring-secondary focus:border-secondary transition-all font-body-md text-on-surface" type="date"/>
+</div>
+</div>
+<div class="space-y-2">
+<label class="block font-label-caps text-label-caps uppercase text-on-surface-variant">TD Slip ID</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">tag</span>
+<input class="w-full pl-10 pr-4 py-2.5 bg-surface-bright border border-outline-variant rounded-lg focus:ring-2 focus:ring-secondary focus:border-secondary transition-all font-body-md text-on-surface" placeholder="e.g. TD-2023-8842" type="text"/>
+</div>
+</div>
+<!-- Row 2: Customer and Vehicle -->
+<div class="space-y-2">
+<label class="block font-label-caps text-label-caps uppercase text-on-surface-variant">Customer Name</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">person</span>
+<input class="w-full pl-10 pr-4 py-2.5 bg-surface-bright border border-outline-variant rounded-lg focus:ring-2 focus:ring-secondary focus:border-secondary transition-all font-body-md text-on-surface" placeholder="Enter full name" type="text"/>
+</div>
+</div>
+<div class="space-y-2">
+<label class="block font-label-caps text-label-caps uppercase text-on-surface-variant">Sales Consultant</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">badge</span>
+<select class="w-full pl-10 pr-4 py-2.5 bg-surface-bright border border-outline-variant rounded-lg focus:ring-2 focus:ring-secondary focus:border-secondary transition-all font-body-md text-on-surface appearance-none">
+<option disabled="" selected="" value="">Select Consultant</option>
+<option>Alex Thompson</option>
+<option>Sarah Jenkins</option>
+<option>Michael Chen</option>
+<option>Emma Rodriguez</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">expand_more</span>
+</div>
+</div>
+<!-- Row 3: Vehicle and Showroom Type -->
+<div class="space-y-2">
+<label class="block font-label-caps text-label-caps uppercase text-on-surface-variant">Vehicle</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">directions_car</span>
+<select class="w-full pl-10 pr-4 py-2.5 bg-surface-bright border border-outline-variant rounded-lg focus:ring-2 focus:ring-secondary focus:border-secondary transition-all font-body-md text-on-surface appearance-none">
+<option disabled="" selected="" value="">Select Vehicle</option>
+<option>2024 Model X SUV - Midnight Blue</option>
+<option>2023 GT Sedan - Polar White</option>
+<option>2024 Compact E-Series - Graphite</option>
+<option>2024 Executive Hybrid - Silver</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">expand_more</span>
+</div>
+</div>
+<div class="space-y-2">
+<label class="block font-label-caps text-label-caps uppercase text-on-surface-variant">Showroom Type</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">store</span>
+<select class="w-full pl-10 pr-4 py-2.5 bg-surface-bright border border-outline-variant rounded-lg focus:ring-2 focus:ring-secondary focus:border-secondary transition-all font-body-md text-on-surface appearance-none">
+<option>Showroom TD</option>
+<option>Home TD</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">expand_more</span>
+</div>
+</div>
+<!-- Row 4: TD Category -->
+<div class="md:col-span-2 space-y-4">
+<label class="block font-label-caps text-label-caps uppercase text-on-surface-variant">TD Category</label>
+<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+<label class="cursor-pointer">
+<input checked="" class="hidden peer" name="category" type="radio" value="Test Drive"/>
+<div class="px-4 py-3 text-center border border-outline-variant rounded-lg font-label-caps text-[10px] uppercase transition-all peer-checked:bg-secondary-container peer-checked:text-on-secondary-container peer-checked:border-secondary-container hover:bg-surface-container-low">
+                                        Test Drive
+                                    </div>
+</label>
+<label class="cursor-pointer">
+<input class="hidden peer" name="category" type="radio" value="Activity"/>
+<div class="px-4 py-3 text-center border border-outline-variant rounded-lg font-label-caps text-[10px] uppercase transition-all peer-checked:bg-secondary-container peer-checked:text-on-secondary-container peer-checked:border-secondary-container hover:bg-surface-container-low">
+                                        Activity
+                                    </div>
+</label>
+<label class="cursor-pointer">
+<input class="hidden peer" name="category" type="radio" value="Experience"/>
+<div class="px-4 py-3 text-center border border-outline-variant rounded-lg font-label-caps text-[10px] uppercase transition-all peer-checked:bg-secondary-container peer-checked:text-on-secondary-container peer-checked:border-secondary-container hover:bg-surface-container-low">
+                                        Experience
+                                    </div>
+</label>
+<label class="cursor-pointer">
+<input class="hidden peer" name="category" type="radio" value="Repeat"/>
+<div class="px-4 py-3 text-center border border-outline-variant rounded-lg font-label-caps text-[10px] uppercase transition-all peer-checked:bg-secondary-container peer-checked:text-on-secondary-container peer-checked:border-secondary-container hover:bg-surface-container-low">
+                                        Repeat Drive
+                                    </div>
+</label>
+<label class="cursor-pointer">
+<input class="hidden peer" name="category" type="radio" value="No Gate Pass"/>
+<div class="px-4 py-3 text-center border border-outline-variant rounded-lg font-label-caps text-[10px] uppercase transition-all peer-checked:bg-secondary-container peer-checked:text-on-secondary-container peer-checked:border-secondary-container hover:bg-surface-container-low">
+                                        No Gate Pass
+                                    </div>
+</label>
+<label class="cursor-pointer">
+<input class="hidden peer" name="category" type="radio" value="Others"/>
+<div class="px-4 py-3 text-center border border-outline-variant rounded-lg font-label-caps text-[10px] uppercase transition-all peer-checked:bg-secondary-container peer-checked:text-on-secondary-container peer-checked:border-secondary-container hover:bg-surface-container-low">
+                                        Others
+                                    </div>
+</label>
+</div>
+</div>
+<!-- Row 5: Remarks -->
+<div class="md:col-span-2 space-y-2">
+<label class="block font-label-caps text-label-caps uppercase text-on-surface-variant">Remarks &amp; Special Instructions</label>
+<textarea class="w-full px-4 py-3 bg-surface-bright border border-outline-variant rounded-lg focus:ring-2 focus:ring-secondary focus:border-secondary transition-all font-body-md text-on-surface resize-none" placeholder="Mention route preference, customer expectations, or vehicle conditions..." rows="4"></textarea>
+</div>
+<!-- Form Actions -->
+<div class="md:col-span-2 pt-6 flex items-center justify-end gap-4 border-t border-outline-variant mt-4">
+<button class="px-8 py-2.5 font-label-caps text-label-caps uppercase rounded-lg border border-outline-variant text-on-surface-variant hover:bg-surface-container transition-all flex items-center gap-2" type="button">
+<span class="material-symbols-outlined text-lg">close</span>
+                                Cancel
+                            </button>
+<button class="px-8 py-2.5 font-label-caps text-label-caps uppercase rounded-lg bg-secondary text-on-secondary hover:bg-[#003ea8] transition-all shadow-md active:scale-95 flex items-center gap-2" type="submit">
+<span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                                Submit Entry
+                            </button>
+</div>
+</form>
+</section>
+<!-- Helpful Context Card -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+<div class="bg-surface-container border border-outline-variant rounded-lg p-4 flex gap-4">
+<div class="w-10 h-10 bg-primary/5 rounded-full flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined">info</span>
+</div>
+<div>
+<p class="font-title-sm text-title-sm text-primary">Compliance Check</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Ensure the customer's driver license is verified before departure.</p>
+</div>
+</div>
+<div class="bg-surface-container border border-outline-variant rounded-lg p-4 flex gap-4">
+<div class="w-10 h-10 bg-primary/5 rounded-full flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined">map</span>
+</div>
+<div>
+<p class="font-title-sm text-title-sm text-primary">Route Optimized</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Home TD routes are automatically logged via the FleetDrive App.</p>
+</div>
+</div>
+<div class="bg-surface-container border border-outline-variant rounded-lg p-4 flex gap-4">
+<div class="w-10 h-10 bg-primary/5 rounded-full flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined">verified_user</span>
+</div>
+<div>
+<p class="font-title-sm text-title-sm text-primary">Safety Protocol</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Panic button and real-time tracking are enabled for all test drives.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<script>
+        // Simple micro-interaction for form submission simulation
+        document.querySelector('form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            const originalContent = btn.innerHTML;
+            
+            btn.innerHTML = '<span class="material-symbols-outlined animate-spin">sync</span> Processing...';
+            btn.disabled = true;
+            btn.classList.add('opacity-80');
+            
+            setTimeout(() => {
+                btn.innerHTML = '<span class="material-symbols-outlined">check</span> Success';
+                btn.classList.replace('bg-secondary', 'bg-green-600');
+                
+                setTimeout(() => {
+                    btn.innerHTML = originalContent;
+                    btn.disabled = false;
+                    btn.classList.replace('bg-green-600', 'bg-secondary');
+                    btn.classList.remove('opacity-80');
+                    e.target.reset();
+                }, 2000);
+            }, 1500);
+        });
+
+        // Toggle focus state on custom radio buttons for accessibility
+        const radios = document.querySelectorAll('input[type="radio"]');
+        radios.forEach(radio => {
+            radio.addEventListener('focus', () => {
+                radio.nextElementSibling.classList.add('ring-2', 'ring-secondary');
+            });
+            radio.addEventListener('blur', () => {
+                radio.nextElementSibling.classList.remove('ring-2', 'ring-secondary');
+            });
+        });
+    </script>
+</body></html>

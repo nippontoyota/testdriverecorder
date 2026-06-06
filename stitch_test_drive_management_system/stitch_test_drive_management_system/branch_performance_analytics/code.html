@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FleetDrive Pro - Analytics Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700&amp;family=Inter:wght@400;600;700&amp;family=JetBrains+Mono:wght@450&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #f7f9fb;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #e2e8f0;
+            border-radius: 10px;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-container": "#fefcff",
+                        "on-tertiary-container": "#75859d",
+                        "on-primary": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "primary": "#000000",
+                        "on-primary-fixed-variant": "#3f465c",
+                        "primary-container": "#131b2e",
+                        "surface-dim": "#d8dadc",
+                        "inverse-on-surface": "#eff1f3",
+                        "tertiary-fixed": "#d3e4fe",
+                        "primary-fixed": "#dae2fd",
+                        "on-error-container": "#93000a",
+                        "surface-bright": "#f7f9fb",
+                        "inverse-primary": "#bec6e0",
+                        "primary-fixed-dim": "#bec6e0",
+                        "on-surface-variant": "#45464d",
+                        "on-tertiary": "#ffffff",
+                        "outline": "#76777d",
+                        "secondary-fixed": "#dbe1ff",
+                        "tertiary-fixed-dim": "#b7c8e1",
+                        "on-secondary-fixed": "#00174b",
+                        "on-surface": "#191c1e",
+                        "secondary-container": "#316bf3",
+                        "surface-variant": "#e0e3e5",
+                        "surface-tint": "#565e74",
+                        "outline-variant": "#c6c6cd",
+                        "on-secondary-fixed-variant": "#003ea8",
+                        "surface-container-low": "#f2f4f6",
+                        "on-primary-fixed": "#131b2e",
+                        "on-secondary": "#ffffff",
+                        "tertiary-container": "#0b1c30",
+                        "on-background": "#191c1e",
+                        "on-tertiary-fixed-variant": "#38485d",
+                        "secondary": "#0051d5",
+                        "on-tertiary-fixed": "#0b1c30",
+                        "on-primary-container": "#7c839b",
+                        "surface-container-highest": "#e0e3e5",
+                        "surface": "#f7f9fb",
+                        "inverse-surface": "#2d3133",
+                        "tertiary": "#000000",
+                        "on-error": "#ffffff",
+                        "surface-container-high": "#e6e8ea",
+                        "surface-container": "#eceef0",
+                        "error": "#ba1a1a",
+                        "secondary-fixed-dim": "#b4c5ff",
+                        "background": "#f7f9fb"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "stack-gap": "12px",
+                        "container-padding": "24px",
+                        "row-height-standard": "48px",
+                        "unit": "4px",
+                        "row-height-dense": "32px",
+                        "gutter": "16px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Hanken Grotesk"],
+                        "label-caps": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "headline-md": ["Hanken Grotesk"],
+                        "table-data": ["Inter"],
+                        "mono-data": ["JetBrains Mono"],
+                        "title-sm": ["Inter"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                        "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "table-data": ["13px", {"lineHeight": "16px", "fontWeight": "400"}],
+                        "mono-data": ["12px", {"lineHeight": "16px", "fontWeight": "450"}],
+                        "title-sm": ["16px", {"lineHeight": "24px", "fontWeight": "600"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background font-body-md overflow-hidden">
+<!-- TopNavBar Shell -->
+<header class="bg-surface-bright dark:bg-inverse-surface border-b border-outline-variant dark:border-outline docked full-width top-0 sticky z-50 flex justify-between items-center h-row-height-standard px-container-padding w-full">
+<div class="flex items-center gap-4">
+<h1 class="font-display-lg text-display-lg font-bold text-primary dark:text-primary-fixed">FleetDrive Pro</h1>
+</div>
+<div class="flex items-center gap-stack-gap">
+<div class="hidden md:flex bg-surface-container-low dark:bg-surface-container-highest px-4 py-1.5 rounded-lg border border-outline-variant items-center gap-2">
+<span class="material-symbols-outlined text-on-surface-variant text-[20px]">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-body-sm w-64" placeholder="Search branch analytics..." type="text"/>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 text-primary dark:text-primary-fixed hover:bg-surface-container-low dark:hover:bg-surface-container-highest transition-colors cursor-pointer active:opacity-80">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 text-primary dark:text-primary-fixed hover:bg-surface-container-low dark:hover:bg-surface-container-highest transition-colors cursor-pointer active:opacity-80">
+<span class="material-symbols-outlined">help</span>
+</button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant ml-2">
+<img alt="Administrator profile photo" class="w-full h-full object-cover" data-alt="A professional headshot of a senior branch manager wearing a tailored navy blue suit and a crisp white shirt. The person has a confident and welcoming expression. The lighting is bright and corporate, set against a blurred modern office background with clean architectural lines and a neutral, high-end aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDJHfuDAJkn23pZ9RDwVQ71V6R0V51Hvyq2848vYwrgbxa9NgQRvpt0SjtDHM9Qx--PS5LmKf3HbwqrJrOJH641CHCDs179GIUw-wZLh6g5HntgFNxXru_8OXdM1euiUhx-lbmweeMxo4CBYWC-BOIF2GBdn4inJdhdffRBEUPY-F1FHXS_QrkaWByzFOHTlbF6IjYCtxkzwguJ523Vl4gOPhAGGKZipn2lw03Wf4ddTwG4m89E36kuVu9c5tslnjmfvN9wRjv4QUs"/>
+</div>
+</div>
+</div>
+</header>
+<div class="flex h-[calc(100vh-48px)]">
+<!-- SideNavBar Shell -->
+<nav class="bg-surface-container-lowest dark:bg-surface-container-highest border-r border-outline-variant dark:border-outline fixed left-0 top-12 h-full w-[240px] z-40 flex flex-col py-stack-gap transition-all duration-200 ease-in-out hidden md:flex">
+<div class="px-6 mb-8">
+<p class="font-label-caps text-label-caps text-on-surface-variant opacity-70">MAIN NAVIGATION</p>
+</div>
+<div class="flex-1 px-4 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded text-on-surface-variant dark:text-surface-variant hover:text-on-surface dark:hover:text-on-surface-fixed hover:bg-surface-container dark:hover:bg-inverse-surface transition-all duration-200" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-caps text-label-caps">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded text-on-surface-variant dark:text-surface-variant hover:text-on-surface dark:hover:text-on-surface-fixed hover:bg-surface-container dark:hover:bg-inverse-surface transition-all duration-200" href="#">
+<span class="material-symbols-outlined">speed</span>
+<span class="font-label-caps text-label-caps">Add Test Drive</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded text-on-surface-variant dark:text-surface-variant hover:text-on-surface dark:hover:text-on-surface-fixed hover:bg-surface-container dark:hover:bg-inverse-surface transition-all duration-200" href="#">
+<span class="material-symbols-outlined">directions_car</span>
+<span class="font-label-caps text-label-caps">Vehicles</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded text-on-surface-variant dark:text-surface-variant hover:text-on-surface dark:hover:text-on-surface-fixed hover:bg-surface-container dark:hover:bg-inverse-surface transition-all duration-200" href="#">
+<span class="material-symbols-outlined">badge</span>
+<span class="font-label-caps text-label-caps">Sales Team</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded text-on-surface-variant dark:text-surface-variant hover:text-on-surface dark:hover:text-on-surface-fixed hover:bg-surface-container dark:hover:bg-inverse-surface transition-all duration-200" href="#">
+<span class="material-symbols-outlined">admin_panel_settings</span>
+<span class="font-label-caps text-label-caps">Admin Panel</span>
+</a>
+<!-- Active Item -->
+<a class="flex items-center gap-3 px-3 py-2.5 rounded text-secondary dark:text-secondary-fixed-dim border-r-2 border-secondary dark:border-secondary-fixed-dim bg-surface-container-low dark:bg-surface-container-high transition-all duration-200" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-label-caps text-label-caps">Analytics</span>
+</a>
+</div>
+<div class="mt-auto px-4 pb-12 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded text-on-surface-variant dark:text-surface-variant hover:text-on-surface dark:hover:text-on-surface-fixed hover:bg-surface-container dark:hover:bg-inverse-surface transition-all duration-200" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-caps text-label-caps">Settings</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded text-on-surface-variant dark:text-surface-variant hover:text-on-surface dark:hover:text-on-surface-fixed hover:bg-surface-container dark:hover:bg-inverse-surface transition-all duration-200" href="#">
+<span class="material-symbols-outlined text-error">logout</span>
+<span class="font-label-caps text-label-caps text-error">Logout</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="flex-1 md:ml-[240px] p-container-padding overflow-y-auto custom-scrollbar h-full">
+<header class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div>
+<p class="font-label-caps text-label-caps text-secondary uppercase tracking-widest mb-1">Branch Overview</p>
+<h2 class="font-headline-md text-headline-md text-on-surface">Analytics Dashboard</h2>
+</div>
+<div class="flex items-center gap-3">
+<div class="bg-surface-container-lowest border border-outline-variant px-3 py-2 flex items-center gap-2 rounded-lg cursor-pointer">
+<span class="material-symbols-outlined text-body-md">calendar_today</span>
+<span class="font-body-md text-body-md">Last 30 Days</span>
+<span class="material-symbols-outlined text-body-md">expand_more</span>
+</div>
+<button class="bg-secondary text-on-secondary px-6 py-2 font-title-sm text-title-sm rounded-lg hover:opacity-90 transition-all shadow-sm">
+                        Export Report
+                    </button>
+</div>
+</header>
+<!-- KPI Bento Grid -->
+<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter mb-gutter">
+<!-- Total Drives Card -->
+<div class="bg-surface-container-lowest border border-outline-variant p-5 rounded-lg">
+<div class="flex justify-between items-start mb-4">
+<div class="bg-secondary-container/10 p-2 rounded">
+<span class="material-symbols-outlined text-secondary">analytics</span>
+</div>
+<span class="font-label-caps text-[10px] px-1.5 py-0.5 bg-green-100 text-green-700 rounded-sm font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]">trending_up</span> 12%
+                        </span>
+</div>
+<p class="font-label-caps text-label-caps text-on-surface-variant">TOTAL DRIVES</p>
+<h3 class="font-display-lg text-display-lg mt-1">1,284</h3>
+<p class="text-body-sm text-on-surface-variant mt-2">vs. 1,146 last month</p>
+</div>
+<!-- Active Sessions -->
+<div class="bg-surface-container-lowest border border-outline-variant p-5 rounded-lg">
+<div class="flex justify-between items-start mb-4">
+<div class="bg-blue-100 p-2 rounded">
+<span class="material-symbols-outlined text-blue-600">timer</span>
+</div>
+<span class="font-label-caps text-[10px] px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded-sm font-bold flex items-center gap-1">
+                            ACTIVE
+                        </span>
+</div>
+<p class="font-label-caps text-label-caps text-on-surface-variant">ACTIVE DRIVES</p>
+<h3 class="font-display-lg text-display-lg mt-1">14</h3>
+<div class="flex mt-3 h-1.5 w-full bg-surface-variant rounded-full overflow-hidden">
+<div class="bg-secondary w-3/4"></div>
+</div>
+</div>
+<!-- Conversion Rate -->
+<div class="bg-surface-container-lowest border border-outline-variant p-5 rounded-lg">
+<div class="flex justify-between items-start mb-4">
+<div class="bg-purple-100 p-2 rounded">
+<span class="material-symbols-outlined text-purple-600">moving</span>
+</div>
+<span class="font-label-caps text-[10px] px-1.5 py-0.5 bg-green-100 text-green-700 rounded-sm font-bold flex items-center gap-1">
+                            +2.4%
+                        </span>
+</div>
+<p class="font-label-caps text-label-caps text-on-surface-variant">CONVERSION RATE</p>
+<h3 class="font-display-lg text-display-lg mt-1">18.2%</h3>
+<p class="text-body-sm text-on-surface-variant mt-2">Drives to Sales</p>
+</div>
+<!-- Branch Rank -->
+<div class="bg-surface-container-lowest border border-outline-variant p-5 rounded-lg">
+<div class="flex justify-between items-start mb-4">
+<div class="bg-amber-100 p-2 rounded">
+<span class="material-symbols-outlined text-amber-600">emoji_events</span>
+</div>
+<span class="font-label-caps text-[10px] px-1.5 py-0.5 bg-amber-50 text-amber-600 rounded-sm font-bold">
+                            REGIONAL #2
+                        </span>
+</div>
+<p class="font-label-caps text-label-caps text-on-surface-variant">SATISFACTION SCORE</p>
+<h3 class="font-display-lg text-display-lg mt-1">4.9<span class="text-title-sm text-on-surface-variant">/5</span></h3>
+<p class="text-body-sm text-on-surface-variant mt-2">982 Reviews</p>
+</div>
+</section>
+<!-- Main Charts & Insights -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-gutter mb-gutter">
+<!-- Trend Line Chart Container -->
+<div class="lg:col-span-2 bg-surface-container-lowest border border-outline-variant p-container-padding rounded-lg flex flex-col">
+<div class="flex justify-between items-center mb-6">
+<h4 class="font-title-sm text-title-sm">Showroom vs. Home TD Trends</h4>
+<div class="flex gap-4">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-secondary"></span>
+<span class="text-body-sm text-on-surface-variant">Showroom</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-slate-300"></span>
+<span class="text-body-sm text-on-surface-variant">Home Delivery</span>
+</div>
+</div>
+</div>
+<!-- Mock Line Chart Visualization -->
+<div class="flex-1 h-64 relative flex flex-col justify-end">
+<div class="absolute inset-0 flex flex-col justify-between py-2 border-l border-b border-outline-variant">
+<div class="border-t border-outline-variant/30 w-full h-0"></div>
+<div class="border-t border-outline-variant/30 w-full h-0"></div>
+<div class="border-t border-outline-variant/30 w-full h-0"></div>
+</div>
+<div class="flex h-full items-end justify-between px-4 z-10">
+<!-- Simple SVG for Chart Lines -->
+<svg class="absolute inset-0 w-full h-full" viewbox="0 0 800 240">
+<path d="M0,200 Q100,180 200,120 T400,150 T600,60 T800,40" fill="none" stroke="#0051d5" stroke-width="3"></path>
+<path d="M0,220 Q100,210 200,190 T400,170 T600,140 T800,130" fill="none" stroke="#cbd5e1" stroke-dasharray="4" stroke-width="2"></path>
+</svg>
+</div>
+<div class="flex justify-between mt-4 px-2">
+<span class="font-label-caps text-[10px]">WK 1</span>
+<span class="font-label-caps text-[10px]">WK 2</span>
+<span class="font-label-caps text-[10px]">WK 3</span>
+<span class="font-label-caps text-[10px]">WK 4</span>
+</div>
+</div>
+</div>
+<!-- Doughnut Chart (Category) -->
+<div class="bg-surface-container-lowest border border-outline-variant p-container-padding rounded-lg">
+<h4 class="font-title-sm text-title-sm mb-6">Drives by Category</h4>
+<div class="flex flex-col items-center">
+<!-- CSS Donut Chart Mockup -->
+<div class="relative w-40 h-40 mb-8">
+<div class="absolute inset-0 rounded-full border-[12px] border-slate-100"></div>
+<div class="absolute inset-0 rounded-full border-[12px] border-secondary border-l-transparent border-b-transparent rotate-45"></div>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="font-display-lg text-display-lg">SUV</span>
+<span class="text-body-sm text-on-surface-variant">Lead</span>
+</div>
+</div>
+<div class="w-full space-y-3">
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-sm bg-secondary"></span>
+<span class="text-body-md">Luxury SUV</span>
+</div>
+<span class="font-mono-data text-mono-data">52%</span>
+</div>
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-sm bg-slate-400"></span>
+<span class="text-body-md">Electric Sedans</span>
+</div>
+<span class="font-mono-data text-mono-data">28%</span>
+</div>
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-sm bg-slate-200"></span>
+<span class="text-body-md">Others</span>
+</div>
+<span class="font-mono-data text-mono-data">20%</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Section: Two Columns (Top Vehicles & Performance) -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-gutter">
+<!-- Top Vehicles Table -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg overflow-hidden flex flex-col">
+<div class="p-container-padding flex justify-between items-center border-b border-outline-variant">
+<h4 class="font-title-sm text-title-sm">Top Performing Vehicles</h4>
+<button class="text-secondary font-label-caps text-label-caps hover:underline">VIEW INVENTORY</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead class="bg-surface-container-low">
+<tr>
+<th class="px-container-padding py-3 font-label-caps text-label-caps text-on-surface-variant">VEHICLE MODEL</th>
+<th class="px-4 py-3 font-label-caps text-label-caps text-on-surface-variant">DRIVES</th>
+<th class="px-4 py-3 font-label-caps text-label-caps text-on-surface-variant">TREND</th>
+<th class="px-container-padding py-3 font-label-caps text-label-caps text-on-surface-variant text-right">STATUS</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<tr class="hover:bg-surface-container transition-colors group">
+<td class="px-container-padding py-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-surface-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface-variant">directions_car</span>
+</div>
+<div>
+<p class="font-title-sm text-title-sm">Vortex GX-900</p>
+<p class="text-body-sm text-on-surface-variant">Luxury SUV</p>
+</div>
+</div>
+</td>
+<td class="px-4 py-4 font-mono-data text-mono-data">342</td>
+<td class="px-4 py-4">
+<span class="text-green-600 material-symbols-outlined text-[18px]">trending_up</span>
+</td>
+<td class="px-container-padding py-4 text-right">
+<span class="px-2 py-1 bg-green-50 text-green-700 text-[10px] font-bold rounded">AVAILABLE</span>
+</td>
+</tr>
+<tr class="hover:bg-surface-container transition-colors group">
+<td class="px-container-padding py-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-surface-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface-variant">electric_car</span>
+</div>
+<div>
+<p class="font-title-sm text-title-sm">E-Nexus Prime</p>
+<p class="text-body-sm text-on-surface-variant">Electric Sedan</p>
+</div>
+</div>
+</td>
+<td class="px-4 py-4 font-mono-data text-mono-data">218</td>
+<td class="px-4 py-4">
+<span class="text-amber-600 material-symbols-outlined text-[18px]">trending_flat</span>
+</td>
+<td class="px-container-padding py-4 text-right">
+<span class="px-2 py-1 bg-blue-50 text-blue-700 text-[10px] font-bold rounded">ACTIVE TD</span>
+</td>
+</tr>
+<tr class="hover:bg-surface-container transition-colors group">
+<td class="px-container-padding py-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-surface-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface-variant">commute</span>
+</div>
+<div>
+<p class="font-title-sm text-title-sm">RoadStar X5</p>
+<p class="text-body-sm text-on-surface-variant">Hybrid Crossover</p>
+</div>
+</div>
+</td>
+<td class="px-4 py-4 font-mono-data text-mono-data">189</td>
+<td class="px-4 py-4">
+<span class="text-green-600 material-symbols-outlined text-[18px]">trending_up</span>
+</td>
+<td class="px-container-padding py-4 text-right">
+<span class="px-2 py-1 bg-green-50 text-green-700 text-[10px] font-bold rounded">AVAILABLE</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Consultant Performance -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-container-padding flex flex-col">
+<div class="flex justify-between items-center mb-6">
+<h4 class="font-title-sm text-title-sm">Consultant Performance</h4>
+<button class="p-1.5 hover:bg-surface-container rounded-full transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant">more_vert</span>
+</button>
+</div>
+<div class="space-y-6">
+<!-- Consultant 1 -->
+<div class="flex items-center gap-4">
+<img alt="Consultant profile" class="w-10 h-10 rounded-full object-cover border border-outline-variant" data-alt="Close-up portrait of a professional female sales consultant in a light grey business suit. She has a warm, professional smile and is positioned against a clean, softly lit corporate showroom background with subtle hints of automotive designs. High-key lighting emphasizing a modern, trustworthy persona." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBTp9C3oVqTDVzCIWuD-fRcmAvrQCUbic_CoBGooGW-K13WaPE-Rs2NbsDu22SJGZSBPVhhnJ2iEHv7Gs15buxboISETI1IUzMjtQcHAq-a7ZFQtb2rkR9VoabpSiZYbi5w2xACITKGbXpgj8T8ozFsPfFs9C6D4wnORP_A2k_AFsgDbA7NnXzcq5j6doKWe_LooLr7ECEXOMS-2VBgyaTuEN5Hqc8hjEGkks7IIoy-gdAvOnAVi7gs3NG2tzbBesA5eO0dQ9_zPcM"/>
+<div class="flex-1">
+<div class="flex justify-between items-center mb-1.5">
+<p class="font-title-sm text-body-md">Elena Rodriguez</p>
+<p class="font-mono-data text-mono-data">48 Drives / 12 Sales</p>
+</div>
+<div class="h-1.5 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="bg-secondary h-full w-[85%] rounded-full"></div>
+</div>
+</div>
+</div>
+<!-- Consultant 2 -->
+<div class="flex items-center gap-4">
+<img alt="Consultant profile" class="w-10 h-10 rounded-full object-cover border border-outline-variant" data-alt="A portrait of a male automotive consultant in a modern business-casual outfit, featuring a dark sweater over a collared shirt. He looks knowledgeable and friendly. The backdrop is a minimal, high-tech showroom with polished floors and bright, even lighting, creating a high-end corporate atmosphere." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCnW1yoe3_MHdYpXJUf6c4fVEikCwyR0Gg_jGDQmTSIBCXrp4LtLbF1spcmel7syWWQwjy84Gd4S1GsxjWFwqrzlI5Rspa5jCdZVxz705wwDEWvEgyXpCM-bWinn4GQWvjOAfaXHnBdt2E4LQE7tuDDw2DM7-QGynogw_SBWHCOUph1cVg61_8VZb37B7EesMG0UX83pOiccXfeYZthrkFhiK2vbuQWNebSxQpwzxhbHOidAkoYnxr_j2s8GRwFo6Q8yRh-VYJkksk"/>
+<div class="flex-1">
+<div class="flex justify-between items-center mb-1.5">
+<p class="font-title-sm text-body-md">Marcus Chen</p>
+<p class="font-mono-data text-mono-data">42 Drives / 9 Sales</p>
+</div>
+<div class="h-1.5 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="bg-secondary h-full w-[72%] rounded-full"></div>
+</div>
+</div>
+</div>
+<!-- Consultant 3 -->
+<div class="flex items-center gap-4">
+<img alt="Consultant profile" class="w-10 h-10 rounded-full object-cover border border-outline-variant" data-alt="Professional headshot of a middle-aged female sales executive. She is wearing a professional blazer and glasses, looking directly at the camera with a confident, analytical expression. The lighting is soft and diffused, set in a contemporary office environment with high-end finishes and a clean, light-mode color palette." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCmaq33HoSR11nlQgu4jURRPP7fe0hDHyjFJt8d6RHAAOBPJ6fy7dS-UoIzcsUy84uj6LYpybNmTXLk8fVfc3XTyBYgECzgRetzt_DpMJiLT3bRCTrGW4N_XOHOa2iFxObD_hk6QIR3H_J0VPIEvg1RbnLX8jAYqL-DdyZEiwXABfjBZl9GWZSETIWn30aQZz003n6lGlnwG4qBAEaIqJOa8p-cWH1G-AzRCtjbg1nu16KEY0Ti9Ncw2hfuxV4m3GBuPOaNMxK-OG8"/>
+<div class="flex-1">
+<div class="flex justify-between items-center mb-1.5">
+<p class="font-title-sm text-body-md">Sarah Jenkins</p>
+<p class="font-mono-data text-mono-data">36 Drives / 11 Sales</p>
+</div>
+<div class="h-1.5 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="bg-secondary h-full w-[90%] rounded-full"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-auto pt-6">
+<div class="bg-surface-container-low p-4 rounded-lg flex items-start gap-3 border border-outline-variant/50">
+<span class="material-symbols-outlined text-secondary">lightbulb</span>
+<p class="text-body-sm text-on-surface-variant leading-relaxed">
+<span class="font-bold text-on-surface">Insight:</span> Conversion rate for Sarah Jenkins is significantly above average (30.5%). Consider pairing her for lead-mentorship in the SUV category.
+                            </p>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- Mobile Navigation Shell -->
+<nav class="md:hidden fixed bottom-0 left-0 right-0 bg-surface-container-lowest border-t border-outline-variant z-50 flex justify-around items-center h-16 px-4">
+<a class="flex flex-col items-center gap-1 text-secondary" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-[10px] font-label-caps">Dashboard</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-on-surface-variant" href="#">
+<span class="material-symbols-outlined">directions_car</span>
+<span class="text-[10px] font-label-caps">Vehicles</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-on-surface-variant" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="text-[10px] font-label-caps">Reports</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-on-surface-variant" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[10px] font-label-caps">Profile</span>
+</a>
+</nav>
+<script>
+        // Simple interactive elements
+        document.querySelectorAll('.hover\\:bg-surface-container').forEach(row => {
+            row.addEventListener('click', () => {
+                console.log('Row clicked, navigating to details...');
+            });
+        });
+
+        // Simulating some animation on load
+        window.onload = () => {
+            const progressBars = document.querySelectorAll('.bg-secondary');
+            progressBars.forEach(bar => {
+                const width = bar.style.width;
+                bar.style.width = '0%';
+                setTimeout(() => {
+                    bar.style.transition = 'width 1s cubic-bezier(0.4, 0, 0.2, 1)';
+                    bar.style.width = width;
+                }, 100);
+            });
+        };
+    </script>
+</body></html>
