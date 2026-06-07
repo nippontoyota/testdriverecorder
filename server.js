@@ -31,6 +31,11 @@ function adminOnly(req, res, next) {
   next();
 }
 
+function coordinatorOnly(req, res, next) {
+  if (req.user.role !== 'coordinator') return res.status(403).json({ error: 'Coordinator only' });
+  next();
+}
+
 // ── auth ─────────────────────────────────────────────────────────────────────
 
 app.post('/api/auth/login', async (req, res) => {
@@ -264,7 +269,7 @@ app.get('/api/consultants', auth, async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-app.post('/api/consultants', auth, async (req, res) => {
+app.post('/api/consultants', auth, coordinatorOnly, async (req, res) => {
   const { branch_id, employee_id, first_name, last_name, type } = req.body;
   if (!branch_id || !employee_id || !first_name || !last_name) return res.status(400).json({ error: 'branch_id, employee_id, first_name, last_name required' });
   if (req.user.role === 'coordinator' && parseInt(branch_id) !== req.user.branch_id)
@@ -323,7 +328,7 @@ app.get('/api/test-drives', auth, async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-app.post('/api/test-drives', auth, async (req, res) => {
+app.post('/api/test-drives', auth, coordinatorOnly, async (req, res) => {
   const { branch_id, car_id, consultant_id, slip_id, customer_name, customer_phone, drive_date, category, showroom_type, kms_in, kms_out, remarks } = req.body;
   if (!branch_id || !car_id || !customer_name || !drive_date) return res.status(400).json({ error: 'branch_id, car_id, customer_name, drive_date required' });
   if (req.user.role === 'coordinator' && parseInt(branch_id) !== req.user.branch_id)

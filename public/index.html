@@ -3,7 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FleetDrive Pro</title>
+  <title>Nippon Toyota — Test Drive Management</title>
+  <script>
+    // Apply saved theme immediately to avoid a flash of the wrong theme
+    (function () {
+      try {
+        var t = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', t);
+      } catch (e) {}
+    })();
+  </script>
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;450;500&display=swap" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
@@ -41,6 +50,50 @@
     }
   </script>
   <style>
+    :root {
+      --bg: #f7f9fb;
+      --card-bg: #ffffff;
+      --border: #e8e8ed;
+      --text: #191c1e;
+      --text-muted: #45464d;
+      --text-faint: #9899a1;
+      --input-border: #c6c6cd;
+      --input-bg: #ffffff;
+      --hover-bg: #f7f9fb;
+      --sidebar-bg: #ffffff;
+      --table-head-bg: #f7f9fb;
+      --row-hover: rgba(49,107,243,0.04);
+      --modal-bg: #ffffff;
+      --nav-active-bg: #eef3ff;
+      --scrollbar-thumb: #c6c6cd;
+    }
+    [data-theme="dark"] {
+      --bg: #15171a;
+      --card-bg: #1e2125;
+      --border: #2c3036;
+      --text: #edeef0;
+      --text-muted: #a6a8ad;
+      --text-faint: #75777c;
+      --input-border: #3a3e45;
+      --input-bg: #25282d;
+      --hover-bg: #25282d;
+      --sidebar-bg: #1a1d21;
+      --table-head-bg: #25282d;
+      --row-hover: rgba(80,140,255,0.08);
+      --modal-bg: #1e2125;
+      --nav-active-bg: rgba(0,81,213,0.18);
+      --scrollbar-thumb: #3a3e45;
+    }
+    [data-theme="dark"] .badge-blue   { background: rgba(59,130,246,0.18); color: #93c5fd; }
+    [data-theme="dark"] .badge-green  { background: rgba(34,197,94,0.18); color: #86efac; }
+    [data-theme="dark"] .badge-amber  { background: rgba(245,158,11,0.18); color: #fcd34d; }
+    [data-theme="dark"] .badge-gray   { background: rgba(148,163,184,0.18); color: #cbd5e1; }
+    [data-theme="dark"] .badge-red    { background: rgba(239,68,68,0.18); color: #fca5a5; }
+    [data-theme="dark"] .toast-success { border-color: #15803d; color: #86efac; }
+    [data-theme="dark"] .toast-error   { border-color: #b91c1c; color: #fca5a5; }
+    [data-theme="dark"] .btn-danger { background: rgba(239,68,68,0.15); color: #fca5a5; border-color: rgba(239,68,68,0.35); }
+    [data-theme="dark"] .btn-danger:hover { background: rgba(239,68,68,0.25); }
+    body { background: var(--bg); color: var(--text); transition: background 0.2s, color 0.2s; }
     *, body { font-family: 'Inter', sans-serif; }
     h1, h2, h3, .font-display { font-family: 'Hanken Grotesk', sans-serif; }
     .mono { font-family: 'JetBrains Mono', monospace; }
@@ -61,52 +114,54 @@
     /* Sidebar */
     #sidebar {
       width: 240px; min-height: 100vh;
-      background: #fff; border-right: 1px solid #e8e8ed;
+      background: var(--sidebar-bg); border-right: 1px solid var(--border);
       display: flex; flex-direction: column; flex-shrink: 0;
+      transition: background 0.2s, border-color 0.2s;
     }
     .nav-item {
       display: flex; align-items: center; gap: 12px;
       padding: 10px 16px; cursor: pointer;
-      color: #45464d; font-size: 14px; font-weight: 500;
+      color: var(--text-muted); font-size: 14px; font-weight: 500;
       border-right: 2px solid transparent;
       transition: all 0.15s; user-select: none;
     }
-    .nav-item:hover { background: #f7f9fb; color: #191c1e; }
+    .nav-item:hover { background: var(--hover-bg); color: var(--text); }
     .nav-item.active {
-      background: #eef3ff; color: #0051d5;
+      background: var(--nav-active-bg); color: #0051d5;
       border-right-color: #0051d5;
     }
     .nav-item.active .ms { font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
 
     /* Top bar */
     #topbar {
-      height: 52px; background: #fff;
-      border-bottom: 1px solid #e8e8ed;
+      height: 52px; background: var(--card-bg);
+      border-bottom: 1px solid var(--border);
       display: flex; align-items: center;
       padding: 0 24px; gap: 12px;
       position: sticky; top: 0; z-index: 20;
+      transition: background 0.2s, border-color 0.2s;
     }
     .search-bar {
       flex: 1; max-width: 320px;
       display: flex; align-items: center; gap: 8px;
-      background: #f7f9fb; border: 1px solid #e8e8ed;
+      background: var(--bg); border: 1px solid var(--border);
       border-radius: 6px; padding: 0 12px; height: 34px;
     }
     .search-bar input {
       background: none; border: none; outline: none;
-      font-size: 13px; color: #191c1e; width: 100%;
+      font-size: 13px; color: var(--text); width: 100%;
     }
-    .search-bar input::placeholder { color: #9899a1; }
+    .search-bar input::placeholder { color: var(--text-faint); }
     .icon-btn {
       width: 34px; height: 34px; border-radius: 6px;
       display: flex; align-items: center; justify-content: center;
-      cursor: pointer; color: #45464d; transition: background 0.15s;
+      cursor: pointer; color: var(--text-muted); transition: background 0.15s;
     }
-    .icon-btn:hover { background: #f7f9fb; }
+    .icon-btn:hover { background: var(--hover-bg); }
     .user-chip {
       display: flex; align-items: center; gap: 8px;
       padding: 4px 10px 4px 4px;
-      border: 1px solid #e8e8ed; border-radius: 20px; cursor: pointer;
+      border: 1px solid var(--border); border-radius: 20px; cursor: pointer;
     }
     .avatar {
       width: 26px; height: 26px; border-radius: 50%;
@@ -119,24 +174,24 @@
     .field-wrap { position: relative; }
     .field-icon {
       position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
-      color: #9899a1; font-size: 18px; pointer-events: none;
+      color: var(--text-faint); font-size: 18px; pointer-events: none;
     }
     .field-icon.top { top: 14px; transform: none; }
     .form-input {
       width: 100%; height: 44px;
-      padding: 0 12px; border: 1px solid #c6c6cd;
-      border-radius: 6px; font-size: 14px; color: #191c1e;
-      background: #fff; outline: none; transition: border-color 0.15s, box-shadow 0.15s;
+      padding: 0 12px; border: 1px solid var(--input-border);
+      border-radius: 6px; font-size: 14px; color: var(--text);
+      background: var(--input-bg); outline: none; transition: border-color 0.15s, box-shadow 0.15s, background 0.2s;
       font-family: 'Inter', sans-serif;
     }
     .form-input.has-icon { padding-left: 40px; }
     .form-input:focus { border-color: #0051d5; box-shadow: 0 0 0 3px rgba(0,81,213,0.12); }
-    .form-input::placeholder { color: #9899a1; }
+    .form-input::placeholder { color: var(--text-faint); }
     select.form-input { appearance: none; cursor: pointer; }
     textarea.form-input { height: auto; padding: 12px; resize: vertical; }
     .form-label {
       font-size: 11px; font-weight: 700; letter-spacing: 0.06em;
-      text-transform: uppercase; color: #45464d; display: block; margin-bottom: 6px;
+      text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 6px;
     }
 
     /* Buttons */
@@ -149,10 +204,10 @@
     .btn-primary { background: #0051d5; color: #fff; }
     .btn-primary:hover { background: #003fa3; }
     .btn-primary:active { background: #002d7a; }
-    .btn-outline { background: #fff; color: #191c1e; border: 1px solid #c6c6cd; }
-    .btn-outline:hover { background: #f7f9fb; }
-    .btn-black { background: #191c1e; color: #fff; }
-    .btn-black:hover { background: #000; }
+    .btn-outline { background: var(--card-bg); color: var(--text); border: 1px solid var(--input-border); }
+    .btn-outline:hover { background: var(--hover-bg); }
+    .btn-black { background: var(--text); color: var(--bg); }
+    .btn-black:hover { opacity: 0.85; }
     .btn-danger { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
     .btn-danger:hover { background: #fecaca; }
     .btn-sm { height: 30px; padding: 0 12px; font-size: 13px; }
@@ -161,8 +216,8 @@
     .cat-btn input[type=radio] { display: none; }
     .cat-btn label {
       display: block; padding: 8px 14px;
-      border: 1px solid #c6c6cd; border-radius: 6px;
-      font-size: 13px; font-weight: 500; color: #45464d;
+      border: 1px solid var(--input-border); border-radius: 6px;
+      font-size: 13px; font-weight: 500; color: var(--text-muted);
       cursor: pointer; text-align: center; transition: all 0.15s;
     }
     .cat-btn input:checked + label {
@@ -171,19 +226,19 @@
     .cat-btn label:hover { border-color: #0051d5; color: #0051d5; }
 
     /* Cards */
-    .card { background: #fff; border: 1px solid #e8e8ed; border-radius: 8px; }
+    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; transition: background 0.2s, border-color 0.2s; }
 
     /* Table */
     .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
     .data-table thead th {
       padding: 10px 14px; text-align: left;
       font-size: 11px; font-weight: 700; letter-spacing: 0.05em;
-      text-transform: uppercase; color: #45464d;
-      background: #f7f9fb; border-bottom: 1px solid #e8e8ed;
+      text-transform: uppercase; color: var(--text-muted);
+      background: var(--table-head-bg); border-bottom: 1px solid var(--border);
       white-space: nowrap;
     }
-    .data-table tbody td { padding: 13px 14px; border-bottom: 1px solid #f3f4f6; color: #191c1e; }
-    .data-table tbody tr:hover { background: rgba(49,107,243,0.04); }
+    .data-table tbody td { padding: 13px 14px; border-bottom: 1px solid var(--border); color: var(--text); }
+    .data-table tbody tr:hover { background: var(--row-hover); }
     .data-table tbody tr:last-child td { border-bottom: none; }
 
     /* Badges */
@@ -199,9 +254,9 @@
     .badge-red    { background: #fee2e2; color: #b91c1c; }
 
     /* Stat cards */
-    .stat-card { background: #fff; border: 1px solid #e8e8ed; border-radius: 8px; padding: 18px 20px; }
-    .stat-value { font-family: 'Hanken Grotesk', sans-serif; font-size: 28px; font-weight: 700; color: #191c1e; }
-    .stat-label { font-size: 12px; color: #45464d; margin-top: 2px; }
+    .stat-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 18px 20px; transition: background 0.2s, border-color 0.2s; }
+    .stat-value { font-family: 'Hanken Grotesk', sans-serif; font-size: 28px; font-weight: 700; color: var(--text); }
+    .stat-label { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
 
     /* Modal */
     .modal-overlay {
@@ -209,8 +264,9 @@
       z-index: 50; display: flex; align-items: center; justify-content: center; padding: 20px;
     }
     .modal-box {
-      background: #fff; border-radius: 12px; padding: 28px;
+      background: var(--modal-bg); border-radius: 12px; padding: 28px;
       width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto;
+      transition: background 0.2s;
     }
 
     /* Toast */
@@ -222,8 +278,8 @@
       transform: translateY(80px); opacity: 0; transition: all 0.3s ease;
     }
     .toast.show { transform: translateY(0); opacity: 1; }
-    .toast-success { background: #fff; border: 1px solid #bbf7d0; color: #15803d; }
-    .toast-error   { background: #fff; border: 1px solid #fecaca; color: #b91c1c; }
+    .toast-success { background: var(--card-bg); border: 1px solid #bbf7d0; color: #15803d; }
+    .toast-error   { background: var(--card-bg); border: 1px solid #fecaca; color: #b91c1c; }
 
     /* Pages */
     .page { display: none; }
@@ -241,7 +297,7 @@
     /* Scrollbar */
     ::-webkit-scrollbar { width: 5px; height: 5px; }
     ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: #c6c6cd; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 4px; }
 
     /* Select chevron */
     .select-wrap { position: relative; }
@@ -249,9 +305,21 @@
       content: 'expand_more';
       font-family: 'Material Symbols Outlined';
       position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
-      color: #45464d; pointer-events: none; font-size: 20px;
+      color: var(--text-muted); pointer-events: none; font-size: 20px;
     }
     .select-wrap select { padding-right: 36px; }
+
+    /* Theme toggle */
+    .theme-toggle {
+      width: 34px; height: 34px; border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: var(--text-muted); transition: background 0.15s;
+    }
+    .theme-toggle:hover { background: var(--hover-bg); }
+
+    /* Brand logo */
+    .brand-logo { height: 38px; width: auto; object-fit: contain; }
+    .brand-logo-lg { height: 56px; width: auto; object-fit: contain; }
   </style>
 </head>
 <body class="bg-surface">
@@ -266,14 +334,8 @@
 <div id="login-screen" class="min-h-screen items-center justify-center bg-surface">
   <div class="w-full max-w-sm">
     <div class="text-center mb-8">
-      <div class="inline-flex items-center gap-3 mb-2">
-        <div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
-          <span class="ms text-white" style="font-size:22px">directions_car</span>
-        </div>
-        <div class="text-left">
-          <div class="font-display text-xl font-bold text-on-surface leading-tight">FleetDrive Pro</div>
-          <div class="text-xs text-on-surface-variant tracking-widest uppercase">Precision Fleet Management</div>
-        </div>
+      <div class="inline-flex items-center justify-center mb-2">
+        <img src="/logo.png" alt="Nippon Toyota" class="brand-logo-lg" />
       </div>
     </div>
     <div class="card p-8">
@@ -309,15 +371,9 @@
   <!-- Sidebar -->
   <aside id="sidebar">
     <!-- Brand -->
-    <div class="px-5 py-5" style="border-bottom:1px solid #e8e8ed">
-      <div class="flex items-center gap-3">
-        <div class="w-9 h-9 bg-primary rounded-lg flex items-center justify-center flex-shrink-0">
-          <span class="ms text-white" style="font-size:20px">directions_car</span>
-        </div>
-        <div>
-          <div class="font-display font-bold text-on-surface" style="font-size:14px;line-height:1.2">FleetDrive Pro</div>
-          <div class="text-on-surface-variant" style="font-size:9px;letter-spacing:0.08em;text-transform:uppercase;margin-top:1px">Precision Fleet Management</div>
-        </div>
+    <div class="px-5 py-5" style="border-bottom:1px solid var(--border)">
+      <div class="flex items-center">
+        <img src="/logo.png" alt="Nippon Toyota" class="brand-logo" />
       </div>
     </div>
 
@@ -325,7 +381,7 @@
     <nav class="flex-1 py-3" id="sidebar-nav"></nav>
 
     <!-- Bottom -->
-    <div style="border-top:1px solid #e8e8ed;padding:8px 0">
+    <div style="border-top:1px solid var(--border);padding:8px 0">
       <div class="nav-item" onclick="logout()">
         <span class="ms">logout</span>
         <span>Logout</span>
@@ -339,17 +395,20 @@
     <!-- Top bar -->
     <div id="topbar">
       <div class="search-bar">
-        <span class="ms" style="font-size:18px;color:#9899a1">search</span>
+        <span class="ms" style="font-size:18px;color:var(--text-faint)">search</span>
         <input type="text" placeholder="Search entries…" id="search-input" />
       </div>
       <div class="flex-1"></div>
+      <div class="theme-toggle" id="theme-toggle" title="Toggle theme" onclick="toggleTheme()">
+        <span class="ms" id="theme-toggle-icon">dark_mode</span>
+      </div>
       <div class="icon-btn" title="Notifications"><span class="ms">notifications</span></div>
       <div class="icon-btn" title="Help"><span class="ms">help</span></div>
       <div class="user-chip">
         <div class="avatar" id="top-avatar">A</div>
         <div class="text-left">
           <div class="text-xs font-semibold text-on-surface leading-tight" id="top-name">Admin</div>
-          <div style="font-size:10px;color:#9899a1;text-transform:uppercase;letter-spacing:0.05em" id="top-role">ADMINISTRATOR</div>
+          <div style="font-size:10px;color:var(--text-faint);text-transform:uppercase;letter-spacing:0.05em" id="top-role">ADMINISTRATOR</div>
         </div>
       </div>
     </div>
@@ -371,7 +430,7 @@
         </div>
         <!-- Recent drives table -->
         <div class="card overflow-hidden">
-          <div class="px-5 py-4 flex items-center justify-between" style="border-bottom:1px solid #e8e8ed">
+          <div class="px-5 py-4 flex items-center justify-between" style="border-bottom:1px solid var(--border)">
             <span class="font-display font-semibold text-on-surface">Recent Test Drives</span>
             <button class="btn btn-outline btn-sm" onclick="navigate('test-drives')">View All</button>
           </div>
@@ -386,7 +445,7 @@
             <div class="text-xs font-bold text-on-surface-variant tracking-widest uppercase mb-1">Operations</div>
             <h1 class="font-display text-2xl font-bold text-on-surface">Test Drives</h1>
           </div>
-          <button class="btn btn-primary" onclick="navigate('add-test-drive')">
+          <button class="btn btn-primary" id="btn-new-td-entry" onclick="navigate('add-test-drive')">
             <span class="ms">add</span> New Entry
           </button>
         </div>
@@ -440,7 +499,7 @@
                 <div>
                   <label class="form-label">TD Slip ID</label>
                   <div class="field-wrap">
-                    <span class="ms field-icon" style="font-size:16px;color:#9899a1;left:13px">#</span>
+                    <span class="ms field-icon" style="font-size:16px;color:var(--text-faint);left:13px">#</span>
                     <input type="text" id="td-slip" class="form-input has-icon" placeholder="e.g. TD-2023-8842" />
                   </div>
                 </div>
@@ -657,11 +716,11 @@
         </div>
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div class="card overflow-hidden">
-            <div class="px-5 py-4 font-display font-semibold" style="border-bottom:1px solid #e8e8ed">Car Models</div>
+            <div class="px-5 py-4 font-display font-semibold" style="border-bottom:1px solid var(--border)">Car Models</div>
             <div class="overflow-x-auto" id="models-table-body"></div>
           </div>
           <div class="card overflow-hidden">
-            <div class="px-5 py-4 font-display font-semibold flex items-center justify-between" style="border-bottom:1px solid #e8e8ed">
+            <div class="px-5 py-4 font-display font-semibold flex items-center justify-between" style="border-bottom:1px solid var(--border)">
               <span>Variants <span class="text-on-surface-variant font-normal text-sm" id="variant-of-model"></span></span>
             </div>
             <div class="overflow-x-auto" id="variants-table-body"></div>
@@ -706,6 +765,24 @@
 // ════════════════════════════════════════════════════════
 let currentUser = null;
 let selectedModelId = null;
+
+// ════════════════════════════════════════════════════════
+//  Theme (dark / light)
+// ════════════════════════════════════════════════════════
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  const icon = document.getElementById('theme-toggle-icon');
+  if (icon) icon.textContent = theme === 'dark' ? 'light_mode' : 'dark_mode';
+  const btn = document.getElementById('theme-toggle');
+  if (btn) btn.title = theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode';
+}
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+  const next = current === 'dark' ? 'light' : 'dark';
+  localStorage.setItem('theme', next);
+  applyTheme(next);
+}
+applyTheme(localStorage.getItem('theme') === 'dark' ? 'dark' : 'light');
 
 // ════════════════════════════════════════════════════════
 //  API
@@ -799,10 +876,10 @@ function buildNav() {
   const isAdmin = currentUser.role === 'admin';
   const items = [
     { id: 'dashboard',       icon: 'dashboard',       label: 'Dashboard',          roles: ['admin','coordinator'] },
-    { id: 'add-test-drive',  icon: 'add_circle',       label: 'Add Test Drive',     roles: ['admin','coordinator'] },
+    { id: 'add-test-drive',  icon: 'add_circle',       label: 'Add Test Drive',     roles: ['coordinator'] },
     { id: 'test-drives',     icon: 'drive_eta',        label: 'Test Drives',        roles: ['admin','coordinator'] },
     { id: 'cars',            icon: 'directions_car',   label: 'Vehicles',           roles: ['admin','coordinator'] },
-    { id: 'consultants',     icon: 'badge',            label: 'Sales Team',         roles: ['admin','coordinator'] },
+    { id: 'consultants',     icon: 'badge',            label: 'Sales Team',         roles: ['coordinator'] },
     null,
     { id: 'users',           icon: 'manage_accounts',  label: 'Admin Panel',        roles: ['admin'] },
     { id: 'models',          icon: 'category',         label: 'Models & Variants',  roles: ['admin'] },
@@ -814,7 +891,7 @@ function buildNav() {
   items.forEach(item => {
     if (!item) {
       const hr = document.createElement('hr');
-      hr.style.cssText = 'border:none;border-top:1px solid #e8e8ed;margin:6px 16px';
+      hr.style.cssText = 'border:none;border-top:1px solid var(--border);margin:6px 16px';
       nav.appendChild(hr); return;
     }
     if (!item.roles.includes(currentUser.role)) return;
@@ -825,6 +902,10 @@ function buildNav() {
     div.addEventListener('click', () => navigate(item.id));
     nav.appendChild(div);
   });
+
+  // Coordinator-only actions hidden from admin
+  const newEntryBtn = document.getElementById('btn-new-td-entry');
+  if (newEntryBtn) newEntryBtn.style.display = isAdmin ? 'none' : '';
 }
 
 // ════════════════════════════════════════════════════════
@@ -832,7 +913,13 @@ function buildNav() {
 // ════════════════════════════════════════════════════════
 const PAGE_IDS = ['dashboard','test-drives','add-test-drive','cars','consultants','users','models','branches'];
 
+const COORDINATOR_ONLY_PAGES = ['add-test-drive', 'consultants'];
+
 function navigate(pageId) {
+  // Block admins from coordinator-only pages (e.g. stale links/state)
+  if (currentUser && currentUser.role === 'admin' && COORDINATOR_ONLY_PAGES.includes(pageId)) {
+    pageId = 'dashboard';
+  }
   // Active nav
   document.querySelectorAll('.nav-item[data-page]').forEach(el =>
     el.classList.toggle('active', el.dataset.page === pageId)
@@ -918,14 +1005,14 @@ function renderDrivesTable(drives, containerId, compact) {
     <tbody>
       ${drives.map(d => `<tr>
         <td class="mono" style="font-size:12px">${d.drive_date}</td>
-        <td class="mono" style="font-size:12px;color:#45464d">${d.slip_id || '—'}</td>
+        <td class="mono" style="font-size:12px;color:var(--text-muted)">${d.slip_id || '—'}</td>
         <td>
           <div class="font-medium text-on-surface">${d.customer_name}</div>
-          ${d.customer_phone ? `<div style="font-size:11px;color:#9899a1">${d.customer_phone}</div>` : ''}
+          ${d.customer_phone ? `<div style="font-size:11px;color:var(--text-faint)">${d.customer_phone}</div>` : ''}
         </td>
         <td>
           <div class="font-medium">${d.brand} ${d.model_name}</div>
-          <div style="font-size:11px;color:#9899a1">${d.variant_name}</div>
+          <div style="font-size:11px;color:var(--text-faint)">${d.variant_name}</div>
         </td>
         <td class="mono" style="font-size:12px;font-weight:500">${d.regd_no}</td>
         ${compact ? '' : `
@@ -1018,7 +1105,7 @@ async function loadCars() {
       <tbody>
         ${cars.map(c => `<tr>
           <td class="mono font-medium" style="font-size:13px">${c.regd_no}</td>
-          <td><div class="font-medium text-on-surface">${c.brand}</div><div style="font-size:11px;color:#9899a1">${c.model_name}</div></td>
+          <td><div class="font-medium text-on-surface">${c.brand}</div><div style="font-size:11px;color:var(--text-faint)">${c.model_name}</div></td>
           <td>${c.variant_name}</td>
           <td>${c.fuel_type}</td>
           <td>${c.transmission}</td>
@@ -1186,7 +1273,7 @@ async function loadUsers() {
           <td class="mono" style="font-size:12px">${u.email}</td>
           <td><span class="badge ${u.role==='admin'?'badge-amber':'badge-blue'}">${u.role}</span></td>
           <td style="font-size:13px">${u.branch_name||'—'}</td>
-          <td style="font-size:12px;color:#9899a1">${(u.created_at||'').split('T')[0]}</td>
+          <td style="font-size:12px;color:var(--text-faint)">${(u.created_at||'').split('T')[0]}</td>
           <td class="flex gap-2">
             <button class="btn btn-outline btn-sm" onclick='showEditUserModal(${JSON.stringify(u)})'><span class="ms" style="font-size:16px">edit</span></button>
             ${u.id!==currentUser.id?`<button class="btn btn-danger btn-sm" onclick="deleteUser(${u.id})"><span class="ms" style="font-size:16px">delete</span></button>`:''}
@@ -1241,7 +1328,7 @@ async function showEditUserModal(u) {
   const html = `<form class="space-y-4">
     <div><label class="form-label">Full Name</label><input id="eu-name" class="form-input" value="${u.name}" /></div>
     <div><label class="form-label">Email</label><input id="eu-email" type="email" class="form-input" value="${u.email}" /></div>
-    <div><label class="form-label">New Password <span style="color:#9899a1;font-weight:400">(leave blank to keep)</span></label><input id="eu-pass" type="password" class="form-input" placeholder="New password" /></div>
+    <div><label class="form-label">New Password <span style="color:var(--text-faint);font-weight:400">(leave blank to keep)</span></label><input id="eu-pass" type="password" class="form-input" placeholder="New password" /></div>
     <div>
       <label class="form-label">Role</label>
       <div class="select-wrap"><select id="eu-role" class="form-input">
