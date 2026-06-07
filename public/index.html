@@ -84,6 +84,10 @@
       --nav-active-bg: rgba(0,81,213,0.18);
       --scrollbar-thumb: #3a3e45;
     }
+    /* Override Tailwind's static surface/on-surface utility colors for dark mode */
+    [data-theme="dark"] .bg-surface { background-color: var(--bg) !important; }
+    [data-theme="dark"] .text-on-surface { color: var(--text) !important; }
+    [data-theme="dark"] .text-on-surface-variant { color: var(--text-muted) !important; }
     [data-theme="dark"] .badge-blue   { background: rgba(59,130,246,0.18); color: #93c5fd; }
     [data-theme="dark"] .badge-green  { background: rgba(34,197,94,0.18); color: #86efac; }
     [data-theme="dark"] .badge-amber  { background: rgba(245,158,11,0.18); color: #fcd34d; }
@@ -1225,7 +1229,7 @@ async function showAddConsultantModal() {
     </div>
     <div>
       <label class="form-label">Employee ID *</label>
-      <input id="c-empid" class="form-input mono" required placeholder="FD-0001" pattern="FD-[0-9]{4}" title="Format: FD-0001" />
+      <input id="c-empid" class="form-input mono" required placeholder="e.g. FD-0001 or EMP123" />
     </div>
     <div>
       <label class="form-label">Consultant Type</label>
