@@ -70,6 +70,7 @@ async function migrate() {
         customer_phone TEXT,
         drive_date DATE NOT NULL,
         category TEXT NOT NULL DEFAULT 'Test Drive' CHECK(category IN ('Test Drive','Activity','Experience','Repeat Drive','Connected Rides','Others')),
+        activity_name TEXT,
         showroom_type TEXT NOT NULL DEFAULT 'Showroom' CHECK(showroom_type IN ('Showroom','Home TD')),
         kms_in NUMERIC,
         kms_out NUMERIC,
@@ -77,6 +78,8 @@ async function migrate() {
         created_by INTEGER REFERENCES users(id),
         created_at TIMESTAMPTZ DEFAULT NOW()
       );
+
+      ALTER TABLE test_drives ADD COLUMN IF NOT EXISTS activity_name TEXT;
     `);
     console.log('Migration complete.');
   } finally {

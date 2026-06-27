@@ -329,15 +329,18 @@ app.get('/api/test-drives', auth, async (req, res) => {
 });
 
 app.post('/api/test-drives', auth, coordinatorOnly, async (req, res) => {
-  const { branch_id, car_id, consultant_id, slip_id, customer_name, customer_phone, drive_date, category, showroom_type, kms_in, kms_out, remarks } = req.body;
-  if (!branch_id || !car_id || !customer_name || !drive_date) return res.status(400).json({ error: 'branch_id, car_id, customer_name, drive_date required' });
+  const { branch_id, car_id, consultant_id, slip_id, customer_name, customer_phone, drive_date, category, activity_name, showroom_type, kms_in, kms_out, remarks } = req.body;
+  if (!branch_id || !car_id || !consultant_id || !customer_name || !customer_phone || !drive_date || !category || !showroom_type || kms_in === undefined || kms_in === null || kms_in === '' || kms_out === undefined || kms_out === null || kms_out === '')
+    return res.status(400).json({ error: 'All fields except TD Slip ID and Remarks are required' });
+  if (category === 'Activity' && !activity_name)
+    return res.status(400).json({ error: 'Activity name is required for the Activity category' });
   if (req.user.role === 'coordinator' && parseInt(branch_id) !== req.user.branch_id)
     return res.status(403).json({ error: 'Access denied' });
   try {
     const row = await q1(
-      `INSERT INTO test_drives (branch_id, car_id, consultant_id, slip_id, customer_name, customer_phone, drive_date, category, showroom_type, kms_in, kms_out, remarks, created_by)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13) RETURNING id`,
-      [branch_id, car_id, consultant_id||null, slip_id||null, customer_name, customer_phone||null, drive_date, category||'Test Drive', showroom_type||'Showroom', kms_in||null, kms_out||null, remarks||null, req.user.id]
+      `INSERT INTO test_drives (branch_id, car_id, consultant_id, slip_id, customer_name, customer_phone, drive_date, category, activity_name, showroom_type, kms_in, kms_out, remarks, created_by)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14) RETURNING id`,
+      [branch_id, car_id, consultant_id, slip_id||null, customer_name, customer_phone, drive_date, category, category==='Activity'?activity_name:null, showroom_type, kms_in, kms_out, remarks||null, req.user.id]
     );
     res.status(201).json(row);
   } catch (e) { res.status(500).json({ error: e.message }); }
