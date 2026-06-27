@@ -707,6 +707,37 @@
         </div>
       </div>
 
+      <!-- ── ADMIN: CREATE USER ─────────────────────── -->
+      <div id="page-create-user" class="page p-6">
+        <div class="mb-6">
+          <div class="text-xs font-bold text-on-surface-variant tracking-widest uppercase mb-1">Admin Panel</div>
+          <h1 class="font-display text-2xl font-bold text-on-surface">Create User</h1>
+        </div>
+        <div class="card p-6" style="max-width:480px">
+          <form id="create-user-form" class="space-y-4">
+            <div><label class="form-label">Full Name *</label><input id="cu-name" class="form-input" required placeholder="Jane Doe" /></div>
+            <div><label class="form-label">Email ID *</label><input id="cu-email" type="email" class="form-input" required placeholder="jane@example.com" /></div>
+            <div>
+              <label class="form-label">Branch</label>
+              <div class="select-wrap"><select id="cu-branch" class="form-input">
+                <option value="">No branch</option>
+              </select></div>
+            </div>
+            <div>
+              <label class="form-label">Role *</label>
+              <div class="select-wrap"><select id="cu-role" class="form-input">
+                <option value="coordinator">Coordinator</option>
+                <option value="admin">Admin</option>
+              </select></div>
+            </div>
+            <div><label class="form-label">Password *</label><input id="cu-pass" type="password" class="form-input" required placeholder="Min 6 chars" minlength="6" /></div>
+            <div class="flex gap-3 pt-2">
+              <button type="submit" class="btn btn-primary flex-1 justify-center">Create User</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
       <!-- ── ADMIN: MODELS & VARIANTS ──────────────── -->
       <div id="page-models" class="page p-6">
         <div class="flex items-start justify-between mb-6">
@@ -886,6 +917,7 @@ function buildNav() {
     { id: 'consultants',     icon: 'badge',            label: 'Sales Team',         roles: ['coordinator'] },
     null,
     { id: 'users',           icon: 'manage_accounts',  label: 'Admin Panel',        roles: ['admin'] },
+    { id: 'create-user',     icon: 'person_add',       label: 'Create User',        roles: ['admin'] },
     { id: 'models',          icon: 'category',         label: 'Models & Variants',  roles: ['admin'] },
     { id: 'branches',        icon: 'store',            label: 'Branches',           roles: ['admin'] },
   ];
@@ -915,7 +947,7 @@ function buildNav() {
 // ════════════════════════════════════════════════════════
 //  Navigation
 // ════════════════════════════════════════════════════════
-const PAGE_IDS = ['dashboard','test-drives','add-test-drive','cars','consultants','users','models','branches'];
+const PAGE_IDS = ['dashboard','test-drives','add-test-drive','cars','consultants','users','create-user','models','branches'];
 
 const COORDINATOR_ONLY_PAGES = ['add-test-drive', 'consultants'];
 
@@ -945,6 +977,7 @@ function navigate(pageId) {
     'cars':           loadCars,
     'consultants':    loadConsultants,
     'users':          loadUsers,
+    'create-user':    initCreateUser,
     'models':         loadModels,
     'branches':       loadBranches,
   };
@@ -1286,6 +1319,29 @@ async function loadUsers() {
       </tbody>
     </table>`;
   } catch(e) { toast(e.message, 'error'); }
+}
+
+async function initCreateUser() {
+  const branches = await get('/branches');
+  const sel = document.getElementById('cu-branch');
+  sel.innerHTML = '<option value="">No branch</option>' +
+    branches.map(b => `<option value="${b.id}">${b.name}</option>`).join('');
+
+  const form = document.getElementById('create-user-form');
+  form.onsubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await post('/users', {
+        name:      document.getElementById('cu-name').value,
+        email:     document.getElementById('cu-email').value,
+        branch_id: document.getElementById('cu-branch').value || null,
+        role:      document.getElementById('cu-role').value,
+        password:  document.getElementById('cu-pass').value,
+      });
+      toast('User created!');
+      form.reset();
+    } catch (err) { toast(err.message, 'error'); }
+  };
 }
 
 async function showAddUserModal() {
