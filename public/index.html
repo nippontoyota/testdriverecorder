@@ -14,6 +14,7 @@
     })();
   </script>
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;450;500&display=swap" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
   <script>
@@ -733,9 +734,16 @@
             </div>
             <div>
               <label class="form-label">Role *</label>
-              <div class="select-wrap"><select id="cu-role" class="form-input">
+              <div class="select-wrap"><select id="cu-role" class="form-input" onchange="toggleCUFields()">
                 <option value="coordinator">Coordinator</option>
+                <option value="cluster_manager">Cluster Manager</option>
                 <option value="admin">Admin</option>
+              </select></div>
+            </div>
+            <div id="cu-cluster-wrap" class="hidden">
+              <label class="form-label">Cluster</label>
+              <div class="select-wrap"><select id="cu-cluster" class="form-input">
+                <option value="">Select Cluster</option>
               </select></div>
             </div>
             <div><label class="form-label">Password *</label><input id="cu-pass" type="password" class="form-input" required placeholder="Min 6 chars" minlength="6" /></div>
@@ -784,6 +792,111 @@
         </div>
         <div class="card overflow-hidden max-w-lg">
           <div class="overflow-x-auto" id="branches-table-body"></div>
+        </div>
+      </div>
+
+      <!-- ── CLUSTER DASHBOARD ────────────────────── -->
+      <div id="page-cluster-dashboard" class="page p-6">
+        <div class="mb-5">
+          <div class="text-xs font-bold text-on-surface-variant tracking-widest uppercase mb-1">Cluster Analytics</div>
+          <h1 class="font-display text-2xl font-bold text-on-surface" id="cd-title">Cluster Dashboard</h1>
+          <p class="text-sm text-on-surface-variant mt-1" id="cd-subtitle">Month-to-date performance across your cluster</p>
+        </div>
+
+        <!-- Filters -->
+        <div class="flex gap-3 mb-6 flex-wrap items-end">
+          <div>
+            <label class="form-label">From Date</label>
+            <input type="date" id="cd-from" class="form-input" style="width:155px;height:36px" />
+          </div>
+          <div>
+            <label class="form-label">To Date</label>
+            <input type="date" id="cd-to" class="form-input" style="width:155px;height:36px" />
+          </div>
+          <div>
+            <label class="form-label">Branch</label>
+            <div class="select-wrap">
+              <select id="cd-branch-filter" class="form-input" style="width:190px;height:36px">
+                <option value="">All Branches</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="applyClusterFilter()" style="margin-bottom:1px">
+            <span class="ms" style="font-size:17px">refresh</span> Refresh
+          </button>
+        </div>
+
+        <!-- KPI Cards -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div class="stat-card">
+            <div class="stat-value text-secondary" id="cd-stat-mtd">—</div>
+            <div class="stat-label">MTD Test Drives</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="cd-stat-cars">—</div>
+            <div class="stat-label">Total Vehicles</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="cd-stat-cons">—</div>
+            <div class="stat-label">Active Consultants</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="cd-stat-all">—</div>
+            <div class="stat-label">All-time Test Drives</div>
+          </div>
+        </div>
+
+        <!-- Row 1: Model-wise + Consultant-wise -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+          <div class="card overflow-hidden">
+            <div class="px-5 py-4 font-display font-semibold text-on-surface" style="border-bottom:1px solid var(--border)">
+              <span class="ms text-secondary" style="font-size:18px;vertical-align:middle;margin-right:6px">directions_car</span>Model-wise Test Drives
+            </div>
+            <div class="overflow-x-auto" id="cd-model-table"></div>
+          </div>
+          <div class="card overflow-hidden">
+            <div class="px-5 py-4 font-display font-semibold text-on-surface" style="border-bottom:1px solid var(--border)">
+              <span class="ms text-secondary" style="font-size:18px;vertical-align:middle;margin-right:6px">badge</span>Sales Officer-wise Test Drives
+            </div>
+            <div class="overflow-x-auto" id="cd-consultant-table"></div>
+          </div>
+        </div>
+
+        <!-- Row 2: Per-car KM + Category pie -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+          <div class="card overflow-hidden">
+            <div class="px-5 py-4 font-display font-semibold text-on-surface" style="border-bottom:1px solid var(--border)">
+              <span class="ms text-secondary" style="font-size:18px;vertical-align:middle;margin-right:6px">speed</span>Per-car KM Usage
+            </div>
+            <div class="overflow-x-auto" id="cd-car-km-table"></div>
+          </div>
+          <div class="card p-5">
+            <div class="font-display font-semibold text-on-surface mb-4">
+              <span class="ms text-secondary" style="font-size:18px;vertical-align:middle;margin-right:6px">donut_large</span>TD Category Breakdown
+            </div>
+            <div style="display:flex;align-items:center;justify-content:center;min-height:200px" id="cd-chart-wrap">
+              <canvas id="cd-category-chart" style="max-width:220px;max-height:220px"></canvas>
+            </div>
+            <div id="cd-category-legend" class="mt-4 grid grid-cols-2 gap-y-2 gap-x-3"></div>
+          </div>
+        </div>
+
+        <!-- Row 3: Top utilized / Underutilized -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="card p-5">
+            <div class="flex items-center gap-2 mb-4">
+              <span class="ms text-green-600" style="font-size:20px">emoji_events</span>
+              <span class="font-display font-semibold text-on-surface">Top Utilized Cars</span>
+            </div>
+            <div id="cd-top-utilized"></div>
+          </div>
+          <div class="card p-5">
+            <div class="flex items-center gap-2 mb-4">
+              <span class="ms text-amber-500" style="font-size:20px">warning_amber</span>
+              <span class="font-display font-semibold text-on-surface">Underutilized Cars</span>
+            </div>
+            <div id="cd-top-unused"></div>
+          </div>
         </div>
       </div>
 
@@ -910,24 +1023,25 @@ function boot() {
   // Top bar
   document.getElementById('top-avatar').textContent = currentUser.name.charAt(0).toUpperCase();
   document.getElementById('top-name').textContent = currentUser.name;
-  document.getElementById('top-role').textContent = currentUser.role.toUpperCase();
+  document.getElementById('top-role').textContent = currentUser.role.replace(/_/g,' ').toUpperCase();
   buildNav();
-  navigate('dashboard');
+  navigate(currentUser.role === 'cluster_manager' ? 'cluster-dashboard' : 'dashboard');
 }
 
 function buildNav() {
   const isAdmin = currentUser.role === 'admin';
   const items = [
-    { id: 'dashboard',       icon: 'dashboard',       label: 'Dashboard',          roles: ['admin','coordinator'] },
-    { id: 'add-test-drive',  icon: 'add_circle',       label: 'Add Test Drive',     roles: ['coordinator'] },
-    { id: 'test-drives',     icon: 'drive_eta',        label: 'Test Drives',        roles: ['admin','coordinator'] },
-    { id: 'cars',            icon: 'directions_car',   label: 'Vehicles',           roles: ['admin','coordinator'] },
-    { id: 'consultants',     icon: 'badge',            label: 'Sales Team',         roles: ['coordinator'] },
+    { id: 'cluster-dashboard', icon: 'analytics',      label: 'Cluster Dashboard',  roles: ['cluster_manager'] },
+    { id: 'dashboard',         icon: 'dashboard',      label: 'Dashboard',          roles: ['admin','coordinator'] },
+    { id: 'add-test-drive',    icon: 'add_circle',     label: 'Add Test Drive',     roles: ['coordinator'] },
+    { id: 'test-drives',       icon: 'drive_eta',      label: 'Test Drives',        roles: ['admin','coordinator','cluster_manager'] },
+    { id: 'cars',              icon: 'directions_car', label: 'Vehicles',           roles: ['admin','coordinator'] },
+    { id: 'consultants',       icon: 'badge',          label: 'Sales Team',         roles: ['coordinator'] },
     null,
-    { id: 'users',           icon: 'manage_accounts',  label: 'Admin Panel',        roles: ['admin'] },
-    { id: 'create-user',     icon: 'person_add',       label: 'Create User',        roles: ['admin'] },
-    { id: 'models',          icon: 'category',         label: 'Models & Variants',  roles: ['admin'] },
-    { id: 'branches',        icon: 'store',            label: 'Branches',           roles: ['admin'] },
+    { id: 'users',             icon: 'manage_accounts',label: 'Admin Panel',        roles: ['admin'] },
+    { id: 'create-user',       icon: 'person_add',     label: 'Create User',        roles: ['admin'] },
+    { id: 'models',            icon: 'category',       label: 'Models & Variants',  roles: ['admin'] },
+    { id: 'branches',          icon: 'store',          label: 'Branches',           roles: ['admin'] },
   ];
 
   const nav = document.getElementById('sidebar-nav');
@@ -955,15 +1069,20 @@ function buildNav() {
 // ════════════════════════════════════════════════════════
 //  Navigation
 // ════════════════════════════════════════════════════════
-const PAGE_IDS = ['dashboard','test-drives','add-test-drive','cars','consultants','users','create-user','models','branches'];
+const PAGE_IDS = ['dashboard','test-drives','add-test-drive','cars','consultants','users','create-user','models','branches','cluster-dashboard'];
 
 const COORDINATOR_ONLY_PAGES = ['add-test-drive', 'consultants'];
+const CLUSTER_ONLY_PAGES = ['cluster-dashboard'];
 
 function navigate(pageId) {
-  // Block admins from coordinator-only pages (e.g. stale links/state)
-  if (currentUser && currentUser.role === 'admin' && COORDINATOR_ONLY_PAGES.includes(pageId)) {
-    pageId = 'dashboard';
-  }
+  if (!currentUser) return;
+  const role = currentUser.role;
+  // Admins can't access coordinator-only pages
+  if (role === 'admin' && COORDINATOR_ONLY_PAGES.includes(pageId)) pageId = 'dashboard';
+  // Non-cluster-managers can't access cluster dashboard
+  if (role !== 'cluster_manager' && CLUSTER_ONLY_PAGES.includes(pageId)) pageId = 'dashboard';
+  // Cluster managers can only access cluster-dashboard and test-drives
+  if (role === 'cluster_manager' && !['cluster-dashboard','test-drives'].includes(pageId)) pageId = 'cluster-dashboard';
   // Active nav
   document.querySelectorAll('.nav-item[data-page]').forEach(el =>
     el.classList.toggle('active', el.dataset.page === pageId)
@@ -979,15 +1098,16 @@ function navigate(pageId) {
 
   // Load data
   const loaders = {
-    'dashboard':      loadDashboard,
-    'test-drives':    loadTestDrives,
-    'add-test-drive': initAddTD,
-    'cars':           loadCars,
-    'consultants':    loadConsultants,
-    'users':          loadUsers,
-    'create-user':    initCreateUser,
-    'models':         loadModels,
-    'branches':       loadBranches,
+    'dashboard':         loadDashboard,
+    'test-drives':       loadTestDrives,
+    'add-test-drive':    initAddTD,
+    'cars':              loadCars,
+    'consultants':       loadConsultants,
+    'users':             loadUsers,
+    'create-user':       initCreateUser,
+    'models':            loadModels,
+    'branches':          loadBranches,
+    'cluster-dashboard': loadClusterDashboard,
   };
   if (loaders[pageId]) loaders[pageId]();
 }
@@ -1329,8 +1449,8 @@ async function loadUsers() {
         ${users.map(u => `<tr>
           <td class="font-medium text-on-surface">${u.name}</td>
           <td class="mono" style="font-size:12px">${u.email}</td>
-          <td><span class="badge ${u.role==='admin'?'badge-amber':'badge-blue'}">${u.role}</span></td>
-          <td style="font-size:13px">${u.branch_name||'—'}</td>
+          <td><span class="badge ${u.role==='admin'?'badge-amber':u.role==='cluster_manager'?'badge-green':'badge-blue'}">${u.role==='cluster_manager'?'cluster mgr':u.role}</span></td>
+          <td style="font-size:13px">${u.cluster_name||u.branch_name||'—'}</td>
           <td style="font-size:12px;color:var(--text-faint)">${(u.created_at||'').split('T')[0]}</td>
           <td class="flex gap-2">
             <button class="btn btn-outline btn-sm" onclick='showEditUserModal(${JSON.stringify(u)})'><span class="ms" style="font-size:16px">edit</span></button>
@@ -1342,47 +1462,72 @@ async function loadUsers() {
   } catch(e) { toast(e.message, 'error'); }
 }
 
+function toggleCUFields() {
+  const role = document.getElementById('cu-role').value;
+  document.getElementById('cu-cluster-wrap').classList.toggle('hidden', role !== 'cluster_manager');
+  const branchWrap = document.getElementById('cu-branch')?.closest('div');
+  if (branchWrap) branchWrap.style.display = role === 'cluster_manager' ? 'none' : '';
+}
+
 async function initCreateUser() {
-  const branches = await get('/branches');
-  const sel = document.getElementById('cu-branch');
-  sel.innerHTML = '<option value="">No branch</option>' +
+  const [branches, clusters] = await Promise.all([get('/branches'), get('/clusters').catch(() => [])]);
+
+  const branchSel = document.getElementById('cu-branch');
+  branchSel.innerHTML = '<option value="">No branch</option>' +
     branches.map(b => `<option value="${b.id}">${b.name}</option>`).join('');
+
+  const clusterSel = document.getElementById('cu-cluster');
+  clusterSel.innerHTML = '<option value="">Select Cluster</option>' +
+    clusters.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+
+  toggleCUFields();
 
   const form = document.getElementById('create-user-form');
   form.onsubmit = async (e) => {
     e.preventDefault();
+    const role = document.getElementById('cu-role').value;
     try {
       await post('/users', {
-        name:      document.getElementById('cu-name').value,
-        email:     document.getElementById('cu-email').value,
-        branch_id: document.getElementById('cu-branch').value || null,
-        role:      document.getElementById('cu-role').value,
-        password:  document.getElementById('cu-pass').value,
+        name:       document.getElementById('cu-name').value,
+        email:      document.getElementById('cu-email').value,
+        role,
+        branch_id:  role === 'cluster_manager' ? null : (document.getElementById('cu-branch').value || null),
+        cluster_id: role === 'cluster_manager' ? (document.getElementById('cu-cluster').value || null) : null,
+        password:   document.getElementById('cu-pass').value,
       });
       toast('User created!');
       form.reset();
+      toggleCUFields();
     } catch (err) { toast(err.message, 'error'); }
   };
 }
 
 async function showAddUserModal() {
-  const branches = await get('/branches');
+  const [branches, clusters] = await Promise.all([get('/branches'), get('/clusters').catch(() => [])]);
   const html = `<form class="space-y-4">
     <div><label class="form-label">Full Name *</label><input id="u-name" class="form-input" required placeholder="Jane Doe" /></div>
     <div><label class="form-label">Email *</label><input id="u-email" type="email" class="form-input" required placeholder="jane@example.com" /></div>
     <div><label class="form-label">Password *</label><input id="u-pass" type="password" class="form-input" required placeholder="Min 6 chars" minlength="6" /></div>
     <div>
       <label class="form-label">Role *</label>
-      <div class="select-wrap"><select id="u-role" class="form-input">
+      <div class="select-wrap"><select id="u-role" class="form-input" onchange="toggleUModalFields()">
         <option value="coordinator">Coordinator</option>
+        <option value="cluster_manager">Cluster Manager</option>
         <option value="admin">Admin</option>
       </select></div>
     </div>
-    <div>
+    <div id="u-branch-wrap">
       <label class="form-label">Branch</label>
       <div class="select-wrap"><select id="u-branch" class="form-input">
         <option value="">No branch</option>
         ${branches.map(b => `<option value="${b.id}">${b.name}</option>`).join('')}
+      </select></div>
+    </div>
+    <div id="u-cluster-wrap" class="hidden">
+      <label class="form-label">Cluster</label>
+      <div class="select-wrap"><select id="u-cluster" class="form-input">
+        <option value="">Select Cluster</option>
+        ${clusters.map(c => `<option value="${c.id}">${c.name}</option>`).join('')}
       </select></div>
     </div>
     <div class="flex gap-3 pt-2">
@@ -1391,37 +1536,55 @@ async function showAddUserModal() {
     </div>
   </form>`;
   showModal('Add User', html, async () => {
+    const role = document.getElementById('u-role').value;
     try {
       await post('/users', {
-        name:      document.getElementById('u-name').value,
-        email:     document.getElementById('u-email').value,
-        password:  document.getElementById('u-pass').value,
-        role:      document.getElementById('u-role').value,
-        branch_id: document.getElementById('u-branch').value || null,
+        name:       document.getElementById('u-name').value,
+        email:      document.getElementById('u-email').value,
+        password:   document.getElementById('u-pass').value,
+        role,
+        branch_id:  role === 'cluster_manager' ? null : (document.getElementById('u-branch').value || null),
+        cluster_id: role === 'cluster_manager' ? (document.getElementById('u-cluster').value || null) : null,
       });
       toast('User created!'); closeModal(); loadUsers();
     } catch(err) { toast(err.message, 'error'); }
   });
 }
 
+function toggleUModalFields() {
+  const role = document.getElementById('u-role')?.value;
+  if (!role) return;
+  document.getElementById('u-branch-wrap')?.classList.toggle('hidden', role === 'cluster_manager');
+  document.getElementById('u-cluster-wrap')?.classList.toggle('hidden', role !== 'cluster_manager');
+}
+
 async function showEditUserModal(u) {
-  const branches = await get('/branches');
+  const [branches, clusters] = await Promise.all([get('/branches'), get('/clusters').catch(() => [])]);
+  const isCM = u.role === 'cluster_manager';
   const html = `<form class="space-y-4">
     <div><label class="form-label">Full Name</label><input id="eu-name" class="form-input" value="${u.name}" /></div>
     <div><label class="form-label">Email</label><input id="eu-email" type="email" class="form-input" value="${u.email}" /></div>
     <div><label class="form-label">New Password <span style="color:var(--text-faint);font-weight:400">(leave blank to keep)</span></label><input id="eu-pass" type="password" class="form-input" placeholder="New password" /></div>
     <div>
       <label class="form-label">Role</label>
-      <div class="select-wrap"><select id="eu-role" class="form-input">
+      <div class="select-wrap"><select id="eu-role" class="form-input" onchange="toggleEUModalFields()">
         <option value="coordinator" ${u.role==='coordinator'?'selected':''}>Coordinator</option>
+        <option value="cluster_manager" ${u.role==='cluster_manager'?'selected':''}>Cluster Manager</option>
         <option value="admin" ${u.role==='admin'?'selected':''}>Admin</option>
       </select></div>
     </div>
-    <div>
+    <div id="eu-branch-wrap" ${isCM?'class="hidden"':''}>
       <label class="form-label">Branch</label>
       <div class="select-wrap"><select id="eu-branch" class="form-input">
         <option value="">No branch</option>
         ${branches.map(b => `<option value="${b.id}" ${b.id===u.branch_id?'selected':''}>${b.name}</option>`).join('')}
+      </select></div>
+    </div>
+    <div id="eu-cluster-wrap" ${!isCM?'class="hidden"':''}>
+      <label class="form-label">Cluster</label>
+      <div class="select-wrap"><select id="eu-cluster" class="form-input">
+        <option value="">No cluster</option>
+        ${clusters.map(c => `<option value="${c.id}" ${c.id===u.cluster_id?'selected':''}>${c.name}</option>`).join('')}
       </select></div>
     </div>
     <div class="flex gap-3 pt-2">
@@ -1430,18 +1593,27 @@ async function showEditUserModal(u) {
     </div>
   </form>`;
   showModal('Edit User', html, async () => {
+    const role = document.getElementById('eu-role').value;
     try {
       const pass = document.getElementById('eu-pass').value;
       await put('/users/' + u.id, {
-        name:      document.getElementById('eu-name').value,
-        email:     document.getElementById('eu-email').value,
-        role:      document.getElementById('eu-role').value,
-        branch_id: document.getElementById('eu-branch').value || null,
+        name:       document.getElementById('eu-name').value,
+        email:      document.getElementById('eu-email').value,
+        role,
+        branch_id:  role === 'cluster_manager' ? null : (document.getElementById('eu-branch').value || null),
+        cluster_id: role === 'cluster_manager' ? (document.getElementById('eu-cluster').value || null) : null,
         ...(pass ? { password: pass } : {}),
       });
       toast('User updated!'); closeModal(); loadUsers();
     } catch(err) { toast(err.message, 'error'); }
   });
+}
+
+function toggleEUModalFields() {
+  const role = document.getElementById('eu-role')?.value;
+  if (!role) return;
+  document.getElementById('eu-branch-wrap')?.classList.toggle('hidden', role === 'cluster_manager');
+  document.getElementById('eu-cluster-wrap')?.classList.toggle('hidden', role !== 'cluster_manager');
 }
 
 async function deleteUser(id) {
@@ -1602,6 +1774,163 @@ async function deleteBranch(id) {
   if (!confirm('Delete this branch?')) return;
   try { await del('/branches/' + id); toast('Branch deleted'); loadBranches(); }
   catch(e) { toast(e.message, 'error'); }
+}
+
+// ════════════════════════════════════════════════════════
+//  Cluster Dashboard
+// ════════════════════════════════════════════════════════
+let cdCategoryChart = null;
+let cdBranchesLoaded = false;
+
+async function loadClusterDashboard() {
+  // Set default MTD dates on first load
+  const fromEl = document.getElementById('cd-from');
+  const toEl   = document.getElementById('cd-to');
+  const today  = new Date();
+  if (!fromEl.value) fromEl.value = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-01`;
+  if (!toEl.value)   toEl.value   = today.toISOString().split('T')[0];
+
+  const branchFilter = document.getElementById('cd-branch-filter').value;
+  let url = `/cluster-dashboard?date_from=${fromEl.value}&date_to=${toEl.value}`;
+  if (branchFilter) url += `&branch_ids=${branchFilter}`;
+
+  try {
+    const d = await get(url);
+
+    // Title
+    if (d.clusterName) {
+      document.getElementById('cd-title').textContent = d.clusterName + ' Dashboard';
+      document.getElementById('cd-subtitle').textContent = `${d.dateRange.from}  →  ${d.dateRange.to}`;
+    }
+
+    // KPI cards
+    document.getElementById('cd-stat-mtd').textContent  = d.totalDrives;
+    document.getElementById('cd-stat-cars').textContent  = d.totalCars;
+    document.getElementById('cd-stat-cons').textContent  = d.totalConsultants;
+    document.getElementById('cd-stat-all').textContent   = d.totalDrivesAll;
+
+    // Populate branch filter (once)
+    if (!cdBranchesLoaded && d.clusterBranches?.length) {
+      const sel = document.getElementById('cd-branch-filter');
+      d.clusterBranches.forEach(b => {
+        const o = document.createElement('option');
+        o.value = b.id; o.textContent = b.name;
+        sel.appendChild(o);
+      });
+      cdBranchesLoaded = true;
+    }
+
+    // ── Model-wise table ──────────────────────────────
+    const modelEl = document.getElementById('cd-model-table');
+    if (!d.modelStats.length) {
+      modelEl.innerHTML = '<div class="p-8 text-center text-on-surface-variant text-sm">No test drives in this period.</div>';
+    } else {
+      const maxC = Math.max(...d.modelStats.map(m => m.td_count));
+      modelEl.innerHTML = `<table class="data-table">
+        <thead><tr><th>Brand / Model</th><th style="text-align:right">Count</th><th style="width:110px">Share</th></tr></thead>
+        <tbody>${d.modelStats.map(m => `<tr>
+          <td><div class="font-medium text-on-surface">${m.brand} ${m.model_name}</div></td>
+          <td style="text-align:right;font-weight:700">${m.td_count}</td>
+          <td><div style="background:var(--border);border-radius:4px;height:6px;overflow:hidden">
+            <div style="height:100%;background:#0051d5;width:${Math.round(m.td_count/maxC*100)}%;border-radius:4px"></div>
+          </div></td>
+        </tr>`).join('')}</tbody>
+      </table>`;
+    }
+
+    // ── Consultant-wise table ─────────────────────────
+    const consEl = document.getElementById('cd-consultant-table');
+    if (!d.consultantStats.length) {
+      consEl.innerHTML = '<div class="p-8 text-center text-on-surface-variant text-sm">No data for this period.</div>';
+    } else {
+      consEl.innerHTML = `<table class="data-table">
+        <thead><tr><th>#</th><th>Officer</th><th>Branch</th><th style="text-align:right">TDs</th></tr></thead>
+        <tbody>${d.consultantStats.map((c,i) => `<tr>
+          <td style="color:var(--text-faint);font-size:12px">${i+1}</td>
+          <td><div class="font-medium text-on-surface">${c.name}</div>
+              <div style="font-size:11px;color:var(--text-faint)">${c.employee_id}</div></td>
+          <td style="font-size:12px;color:var(--text-muted)">${c.branch_name}</td>
+          <td style="text-align:right;font-weight:700">${c.td_count}</td>
+        </tr>`).join('')}</tbody>
+      </table>`;
+    }
+
+    // ── Per-car KM usage table ────────────────────────
+    const carEl = document.getElementById('cd-car-km-table');
+    if (!d.carKmStats.length) {
+      carEl.innerHTML = '<div class="p-8 text-center text-on-surface-variant text-sm">No vehicles in cluster.</div>';
+    } else {
+      carEl.innerHTML = `<table class="data-table">
+        <thead><tr><th>Reg. No.</th><th>Model</th><th>Branch</th><th style="text-align:right">Trips</th><th style="text-align:right">KM Used</th></tr></thead>
+        <tbody>${d.carKmStats.map(c => {
+          const km = parseFloat(c.total_km_used);
+          return `<tr>
+            <td class="mono font-medium" style="font-size:12px">${c.regd_no}</td>
+            <td style="font-size:12px">${c.model}</td>
+            <td style="font-size:12px;color:var(--text-muted)">${c.branch_name}</td>
+            <td style="text-align:right;font-size:13px">${c.td_count}</td>
+            <td style="text-align:right;font-weight:700;color:${km>0?'var(--text)':'var(--text-faint)'}">${km.toFixed(1)} km</td>
+          </tr>`;
+        }).join('')}</tbody>
+      </table>`;
+    }
+
+    // ── Category doughnut chart ───────────────────────
+    const catCanvas = document.getElementById('cd-category-chart');
+    const catWrap   = document.getElementById('cd-chart-wrap');
+    if (!d.categoryStats.length) {
+      catWrap.innerHTML = '<div class="text-sm text-on-surface-variant">No data for this period.</div>';
+    } else {
+      if (!catCanvas.parentElement) catWrap.appendChild(catCanvas);
+      if (cdCategoryChart) { cdCategoryChart.destroy(); cdCategoryChart = null; }
+      const palette = ['#0051d5','#22c55e','#f59e0b','#ef4444','#8b5cf6','#6b7280'];
+      cdCategoryChart = new Chart(catCanvas, {
+        type: 'doughnut',
+        data: {
+          labels: d.categoryStats.map(c => c.category),
+          datasets: [{ data: d.categoryStats.map(c => c.count), backgroundColor: palette, borderWidth: 0 }]
+        },
+        options: { cutout: '66%', plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.raw}` } } } }
+      });
+      document.getElementById('cd-category-legend').innerHTML = d.categoryStats.map((c,i) => `
+        <div class="flex items-center gap-2" style="font-size:12px">
+          <div style="width:10px;height:10px;border-radius:2px;background:${palette[i]};flex-shrink:0"></div>
+          <span style="color:var(--text-muted)">${c.category}</span>
+          <span style="font-weight:700;color:var(--text);margin-left:auto">${c.count}</span>
+        </div>`).join('');
+    }
+
+    // ── Top / Bottom utilized cars ────────────────────
+    const sorted = [...d.carKmStats].sort((a,b) => parseFloat(b.total_km_used) - parseFloat(a.total_km_used));
+
+    const renderRank = (cars, elId) => {
+      const el = document.getElementById(elId);
+      if (!cars.length) { el.innerHTML = '<div class="text-sm text-on-surface-variant">No vehicles.</div>'; return; }
+      el.innerHTML = cars.slice(0,5).map((c,i) => {
+        const km = parseFloat(c.total_km_used).toFixed(0);
+        return `<div class="flex items-center gap-3 py-3" style="${i?'border-top:1px solid var(--border)':''}">
+          <div style="width:28px;height:28px;border-radius:50%;background:var(--nav-active-bg);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#0051d5;flex-shrink:0">${i+1}</div>
+          <div class="flex-1 min-w-0">
+            <div class="mono font-medium text-on-surface" style="font-size:13px">${c.regd_no}</div>
+            <div style="font-size:11px;color:var(--text-faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.model} · ${c.branch_name}</div>
+          </div>
+          <div class="text-right flex-shrink-0">
+            <div class="font-bold text-on-surface" style="font-size:14px">${km} km</div>
+            <div style="font-size:11px;color:var(--text-faint)">${c.td_count} drive${c.td_count!==1?'s':''}</div>
+          </div>
+        </div>`;
+      }).join('');
+    };
+
+    renderRank(sorted, 'cd-top-utilized');
+    renderRank([...sorted].reverse(), 'cd-top-unused');
+
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+function applyClusterFilter() {
+  cdBranchesLoaded = true; // keep existing branch options
+  loadClusterDashboard();
 }
 
 // ════════════════════════════════════════════════════════

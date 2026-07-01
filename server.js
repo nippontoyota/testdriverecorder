@@ -44,24 +44,33 @@ app.post('/api/auth/login', async (req, res) => {
     if (!email || !password) return res.status(400).json({ error: 'Email and password required' });
 
     const user = await q1(
-      `SELECT u.*, b.name as branch_name FROM users u LEFT JOIN branches b ON u.branch_id = b.id WHERE u.email = $1`,
+      `SELECT u.*, b.name as branch_name, cl.name as cluster_name
+       FROM users u
+       LEFT JOIN branches b ON u.branch_id = b.id
+       LEFT JOIN clusters cl ON u.cluster_id = cl.id
+       WHERE u.email = $1`,
       [email]
     );
     if (!user || !bcrypt.compareSync(password, user.password))
       return res.status(401).json({ error: 'Invalid credentials' });
 
     const token = jwt.sign(
-      { id: user.id, email: user.email, role: user.role, branch_id: user.branch_id, name: user.name },
+      { id: user.id, email: user.email, role: user.role, branch_id: user.branch_id, cluster_id: user.cluster_id, name: user.name },
       JWT_SECRET, { expiresIn: '12h' }
     );
-    res.json({ token, user: { id: user.id, name: user.name, email: user.email, role: user.role, branch_id: user.branch_id, branch_name: user.branch_name } });
+    res.json({ token, user: { id: user.id, name: user.name, email: user.email, role: user.role, branch_id: user.branch_id, branch_name: user.branch_name, cluster_id: user.cluster_id, cluster_name: user.cluster_name } });
   } catch (e) { console.error(e); res.status(500).json({ error: 'Server error' }); }
 });
 
 app.get('/api/auth/me', auth, async (req, res) => {
   try {
     const user = await q1(
-      `SELECT u.id, u.name, u.email, u.role, u.branch_id, b.name as branch_name FROM users u LEFT JOIN branches b ON u.branch_id = b.id WHERE u.id = $1`,
+      `SELECT u.id, u.name, u.email, u.role, u.branch_id, u.cluster_id,
+              b.name as branch_name, cl.name as cluster_name
+       FROM users u
+       LEFT JOIN branches b ON u.branch_id = b.id
+       LEFT JOIN clusters cl ON u.cluster_id = cl.id
+       WHERE u.id = $1`,
       [req.user.id]
     );
     res.json(user);
@@ -96,17 +105,25 @@ app.delete('/api/branches/:id', auth, adminOnly, async (req, res) => {
 
 app.get('/api/users', auth, adminOnly, async (req, res) => {
   try {
-    res.json(await q(`SELECT u.id, u.name, u.email, u.role, u.branch_id, b.name as branch_name, u.created_at FROM users u LEFT JOIN branches b ON u.branch_id = b.id ORDER BY u.created_at DESC`));
+    res.json(await q(`SELECT u.id, u.name, u.email, u.role, u.branch_id, u.cluster_id,
+                      b.name as branch_name, cl.name as cluster_name, u.created_at
+                      FROM users u
+                      LEFT JOIN branches b ON u.branch_id = b.id
+                      LEFT JOIN clusters cl ON u.cluster_id = cl.id
+                      ORDER BY u.created_at DESC`));
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 app.post('/api/users', auth, adminOnly, async (req, res) => {
-  const { name, email, password, role, branch_id } = req.body;
+  const { name, email, password, role, branch_id, cluster_id } = req.body;
   if (!name || !email || !password || !role) return res.status(400).json({ error: 'name, email, password, role required' });
-  if (!['admin','coordinator'].includes(role)) return res.status(400).json({ error: 'Invalid role' });
+  if (!['admin','coordinator','cluster_manager'].includes(role)) return res.status(400).json({ error: 'Invalid role' });
   try {
     const hash = bcrypt.hashSync(password, 10);
-    const row = await q1(`INSERT INTO users (name, email, password, role, branch_id) VALUES ($1,$2,$3,$4,$5) RETURNING id, name, email, role, branch_id`, [name, email, hash, role, branch_id || null]);
+    const row = await q1(
+      `INSERT INTO users (name, email, password, role, branch_id, cluster_id) VALUES ($1,$2,$3,$4,$5,$6) RETURNING id, name, email, role, branch_id, cluster_id`,
+      [name, email, hash, role, branch_id || null, cluster_id || null]
+    );
     res.status(201).json(row);
   } catch (e) {
     if (e.code === '23505') return res.status(409).json({ error: 'Email already exists' });
@@ -115,13 +132,13 @@ app.post('/api/users', auth, adminOnly, async (req, res) => {
 });
 
 app.put('/api/users/:id', auth, adminOnly, async (req, res) => {
-  const { name, email, role, branch_id, password } = req.body;
+  const { name, email, role, branch_id, cluster_id, password } = req.body;
   try {
     const user = await q1(`SELECT * FROM users WHERE id = $1`, [req.params.id]);
     if (!user) return res.status(404).json({ error: 'Not found' });
     const newPass = password ? bcrypt.hashSync(password, 10) : user.password;
-    await q(`UPDATE users SET name=$1, email=$2, role=$3, branch_id=$4, password=$5 WHERE id=$6`,
-      [name||user.name, email||user.email, role||user.role, branch_id??user.branch_id, newPass, req.params.id]);
+    await q(`UPDATE users SET name=$1, email=$2, role=$3, branch_id=$4, cluster_id=$5, password=$6 WHERE id=$7`,
+      [name||user.name, email||user.email, role||user.role, branch_id??user.branch_id, cluster_id??user.cluster_id, newPass, req.params.id]);
     res.json({ ok: true });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
@@ -302,10 +319,27 @@ app.delete('/api/consultants/:id', auth, adminOnly, async (req, res) => {
 
 app.get('/api/test-drives', auth, async (req, res) => {
   try {
-    const branch_id = req.user.role === 'coordinator' ? req.user.branch_id : req.query.branch_id;
     const { date_from, date_to } = req.query;
     const params = [];
     let idx = 1;
+    let branchClause = '';
+
+    if (req.user.role === 'coordinator') {
+      branchClause = ` AND td.branch_id = $${idx++}`;
+      params.push(req.user.branch_id);
+    } else if (req.user.role === 'cluster_manager') {
+      const rows = await q(
+        `SELECT cb.branch_id FROM cluster_branches cb JOIN users u ON u.cluster_id = cb.cluster_id WHERE u.id = $1`,
+        [req.user.id]
+      );
+      const ids = rows.map(r => r.branch_id);
+      if (!ids.length) return res.json([]);
+      branchClause = ` AND td.branch_id = ANY($${idx++}::int[])`;
+      params.push(ids);
+    } else if (req.query.branch_id) {
+      branchClause = ` AND td.branch_id = $${idx++}`;
+      params.push(req.query.branch_id);
+    }
 
     let sql = `SELECT td.*,
                c.regd_no, cv.name as variant_name, m.name as model_name, m.brand,
@@ -317,9 +351,8 @@ app.get('/api/test-drives', auth, async (req, res) => {
                JOIN car_models m ON cv.model_id = m.id
                LEFT JOIN sales_consultants sc ON td.consultant_id = sc.id
                JOIN branches b ON td.branch_id = b.id
-               WHERE 1=1`;
+               WHERE 1=1${branchClause}`;
 
-    if (branch_id) { sql += ` AND td.branch_id = $${idx++}`; params.push(branch_id); }
     if (date_from) { sql += ` AND td.drive_date >= $${idx++}`; params.push(date_from); }
     if (date_to)   { sql += ` AND td.drive_date <= $${idx++}`; params.push(date_to); }
     sql += ` ORDER BY td.drive_date DESC, td.created_at DESC`;
@@ -369,6 +402,86 @@ app.get('/api/stats', auth, async (req, res) => {
 
     res.json({ totalDrives, todayDrives, totalCars, totalConsultants });
   } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// ── clusters ──────────────────────────────────────────────────────────────────
+
+app.get('/api/clusters', auth, adminOnly, async (req, res) => {
+  try {
+    const clusters = await q(`SELECT c.id, c.name, array_agg(cb.branch_id ORDER BY cb.branch_id) as branch_ids FROM clusters c LEFT JOIN cluster_branches cb ON cb.cluster_id = c.id GROUP BY c.id ORDER BY c.name`);
+    res.json(clusters);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// ── cluster dashboard ─────────────────────────────────────────────────────────
+
+app.get('/api/cluster-dashboard', auth, async (req, res) => {
+  try {
+    if (req.user.role !== 'cluster_manager') return res.status(403).json({ error: 'Cluster manager only' });
+
+    const user = await q1(`SELECT u.cluster_id, cl.name as cluster_name FROM users u LEFT JOIN clusters cl ON u.cluster_id = cl.id WHERE u.id = $1`, [req.user.id]);
+    if (!user?.cluster_id) return res.status(400).json({ error: 'No cluster assigned' });
+
+    const allBranchIds = (await q(`SELECT branch_id FROM cluster_branches WHERE cluster_id = $1`, [user.cluster_id])).map(r => r.branch_id);
+    const clusterBranches = await q(`SELECT b.id, b.name FROM branches b JOIN cluster_branches cb ON b.id = cb.branch_id WHERE cb.cluster_id = $1 ORDER BY b.name`, [user.cluster_id]);
+
+    let branchIds = allBranchIds;
+    const { branch_ids, date_from, date_to } = req.query;
+    if (branch_ids) {
+      const req_ids = branch_ids.split(',').map(Number).filter(id => allBranchIds.includes(id));
+      if (req_ids.length) branchIds = req_ids;
+    }
+
+    const today = new Date();
+    const mtdFrom = date_from || `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-01`;
+    const mtdTo   = date_to   || today.toISOString().split('T')[0];
+
+    if (!branchIds.length) {
+      return res.json({ totalDrives: 0, totalDrivesAll: 0, totalCars: 0, totalConsultants: 0, modelStats: [], consultantStats: [], carKmStats: [], categoryStats: [], clusterBranches, clusterName: user.cluster_name, dateRange: { from: mtdFrom, to: mtdTo } });
+    }
+
+    const [tdRow, tdAllRow, carsRow, consRow, modelStats, consultantStats, carKmStats, categoryStats] = await Promise.all([
+      q1(`SELECT COUNT(*)::int as c FROM test_drives WHERE branch_id = ANY($1::int[]) AND drive_date BETWEEN $2 AND $3`, [branchIds, mtdFrom, mtdTo]),
+      q1(`SELECT COUNT(*)::int as c FROM test_drives WHERE branch_id = ANY($1::int[])`, [branchIds]),
+      q1(`SELECT COUNT(*)::int as c FROM cars WHERE branch_id = ANY($1::int[])`, [branchIds]),
+      q1(`SELECT COUNT(*)::int as c FROM sales_consultants WHERE active=true AND branch_id = ANY($1::int[])`, [branchIds]),
+      q(`SELECT m.brand, m.name as model_name, COUNT(td.id)::int as td_count
+         FROM test_drives td
+         JOIN cars c ON td.car_id = c.id
+         JOIN car_variants cv ON c.variant_id = cv.id
+         JOIN car_models m ON cv.model_id = m.id
+         WHERE td.branch_id = ANY($1::int[]) AND td.drive_date BETWEEN $2 AND $3
+         GROUP BY m.id, m.brand, m.name ORDER BY td_count DESC`, [branchIds, mtdFrom, mtdTo]),
+      q(`SELECT sc.first_name || ' ' || sc.last_name as name, sc.employee_id, b.name as branch_name, COUNT(td.id)::int as td_count
+         FROM test_drives td
+         JOIN sales_consultants sc ON td.consultant_id = sc.id
+         JOIN branches b ON sc.branch_id = b.id
+         WHERE td.branch_id = ANY($1::int[]) AND td.drive_date BETWEEN $2 AND $3
+         GROUP BY sc.id, sc.first_name, sc.last_name, sc.employee_id, b.name
+         ORDER BY td_count DESC LIMIT 20`, [branchIds, mtdFrom, mtdTo]),
+      q(`SELECT c.regd_no, m.brand || ' ' || m.name as model, cv.name as variant,
+               b.name as branch_name, COUNT(td.id)::int as td_count,
+               COALESCE(SUM(td.kms_in - td.kms_out), 0)::float as total_km_used
+         FROM cars c
+         JOIN car_variants cv ON c.variant_id = cv.id
+         JOIN car_models m ON cv.model_id = m.id
+         JOIN branches b ON c.branch_id = b.id
+         LEFT JOIN test_drives td ON td.car_id = c.id AND td.drive_date BETWEEN $2 AND $3
+         WHERE c.branch_id = ANY($1::int[])
+         GROUP BY c.id, c.regd_no, m.brand, m.name, cv.name, b.name
+         ORDER BY total_km_used DESC, td_count DESC`, [branchIds, mtdFrom, mtdTo]),
+      q(`SELECT category, COUNT(*)::int as count FROM test_drives
+         WHERE branch_id = ANY($1::int[]) AND drive_date BETWEEN $2 AND $3
+         GROUP BY category ORDER BY count DESC`, [branchIds, mtdFrom, mtdTo]),
+    ]);
+
+    res.json({
+      totalDrives: tdRow?.c || 0, totalDrivesAll: tdAllRow?.c || 0,
+      totalCars: carsRow?.c || 0, totalConsultants: consRow?.c || 0,
+      modelStats, consultantStats, carKmStats, categoryStats,
+      clusterBranches, clusterName: user.cluster_name, dateRange: { from: mtdFrom, to: mtdTo },
+    });
+  } catch (e) { console.error(e); res.status(500).json({ error: e.message }); }
 });
 
 // ── SPA fallback ──────────────────────────────────────────────────────────────
