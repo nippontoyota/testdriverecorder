@@ -325,6 +325,33 @@
     /* Brand logo */
     .brand-logo { height: 38px; width: auto; object-fit: contain; }
     .brand-logo-lg { height: 56px; width: auto; object-fit: contain; }
+
+    /* ── Mobile sidebar overlay ──────────────────────── */
+    #sidebar-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.45); z-index: 39;
+    }
+    #sidebar-overlay.show { display: block; }
+
+    /* ── Mobile responsive ───────────────────────────── */
+    @media (max-width: 1023px) {
+      #sidebar {
+        position: fixed; left: -260px; top: 0; height: 100%;
+        z-index: 40; transition: left 0.25s ease;
+      }
+      #sidebar.open { left: 0; box-shadow: 6px 0 28px rgba(0,0,0,0.18); }
+      .search-bar { display: none !important; }
+      .mob-hide { display: none !important; }
+      .page { padding: 14px !important; }
+      .modal-overlay { padding: 0; align-items: flex-end; }
+      .modal-box { border-radius: 16px 16px 0 0; max-width: 100% !important; max-height: 93vh; }
+      #topbar { padding: 0 10px; gap: 8px; }
+      .stat-value { font-size: 22px; }
+      .stat-card { padding: 14px 14px; }
+    }
+    @media (min-width: 1024px) {
+      #hamburger-btn { display: none !important; }
+    }
   </style>
 </head>
 <body class="bg-surface">
@@ -373,6 +400,9 @@
 <!-- ════════════════════════ APP ════════════════════════ -->
 <div id="app" class="hidden flex min-h-screen">
 
+  <!-- Mobile sidebar overlay -->
+  <div id="sidebar-overlay" onclick="closeSidebar()"></div>
+
   <!-- Sidebar -->
   <aside id="sidebar">
     <!-- Brand -->
@@ -399,6 +429,9 @@
 
     <!-- Top bar -->
     <div id="topbar">
+      <button class="icon-btn" id="hamburger-btn" onclick="toggleSidebar()" title="Menu">
+        <span class="ms">menu</span>
+      </button>
       <div class="search-bar">
         <span class="ms" style="font-size:18px;color:var(--text-faint)">search</span>
         <input type="text" placeholder="Search entries…" id="search-input" />
@@ -407,11 +440,11 @@
       <div class="theme-toggle" id="theme-toggle" title="Toggle theme" onclick="toggleTheme()">
         <span class="ms" id="theme-toggle-icon">dark_mode</span>
       </div>
-      <div class="icon-btn" title="Notifications"><span class="ms">notifications</span></div>
-      <div class="icon-btn" title="Help"><span class="ms">help</span></div>
+      <div class="icon-btn mob-hide" title="Notifications"><span class="ms">notifications</span></div>
+      <div class="icon-btn mob-hide" title="Help"><span class="ms">help</span></div>
       <div class="user-chip">
         <div class="avatar" id="top-avatar">A</div>
-        <div class="text-left">
+        <div class="text-left mob-hide">
           <div class="text-xs font-semibold text-on-surface leading-tight" id="top-name">Admin</div>
           <div style="font-size:10px;color:var(--text-faint);text-transform:uppercase;letter-spacing:0.05em" id="top-role">ADMINISTRATOR</div>
         </div>
@@ -445,7 +478,7 @@
 
       <!-- ── TEST DRIVES LIST ────────────────────────── -->
       <div id="page-test-drives" class="page p-6">
-        <div class="flex items-start justify-between mb-6">
+        <div class="flex items-start justify-between mb-6 gap-3 flex-wrap">
           <div>
             <div class="text-xs font-bold text-on-surface-variant tracking-widest uppercase mb-1">Operations</div>
             <h1 class="font-display text-2xl font-bold text-on-surface">Test Drives</h1>
@@ -493,7 +526,7 @@
           <div class="card p-6">
             <form id="td-form" class="space-y-5">
               <!-- Row 1 -->
-              <div class="grid grid-cols-2 gap-4">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label class="form-label">Test Drive Date</label>
                   <div class="field-wrap">
@@ -510,7 +543,7 @@
                 </div>
               </div>
               <!-- Row 2 -->
-              <div class="grid grid-cols-2 gap-4">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label class="form-label">Customer Name</label>
                   <div class="field-wrap">
@@ -536,7 +569,7 @@
                   </select>
                 </div>
               </div>
-              <div class="grid grid-cols-2 gap-4">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label class="form-label">Sales Consultant</label>
                   <div class="select-wrap field-wrap">
@@ -558,7 +591,7 @@
                 </div>
               </div>
               <!-- KMS -->
-              <div class="grid grid-cols-2 gap-4">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label class="form-label">KMS Out</label>
                   <div class="field-wrap">
@@ -577,7 +610,7 @@
               <!-- Category -->
               <div>
                 <label class="form-label">TD Category</label>
-                <div class="grid grid-cols-3 gap-2" style="grid-template-columns:repeat(6,1fr)">
+                <div class="grid grid-cols-3 sm:grid-cols-6 gap-2">
                   <div class="cat-btn"><input type="radio" name="td-cat" id="cat1" value="Test Drive" checked /><label for="cat1">TEST DRIVE</label></div>
                   <div class="cat-btn"><input type="radio" name="td-cat" id="cat2" value="Activity" /><label for="cat2">ACTIVITY</label></div>
                   <div class="cat-btn"><input type="radio" name="td-cat" id="cat3" value="Experience" /><label for="cat3">EXPERIENCE</label></div>
@@ -610,7 +643,7 @@
           </div>
 
           <!-- Info cards -->
-          <div class="grid grid-cols-3 gap-3 mt-4">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4">
             <div class="card p-4">
               <div class="flex items-center gap-2 mb-2">
                 <span class="ms text-green-600" style="font-size:18px">verified_user</span>
@@ -639,7 +672,7 @@
       <!-- ── BRANCH CARS (VEHICLES) ─────────────────── -->
       <div id="page-cars" class="page p-6">
         <!-- Header -->
-        <div class="flex items-start justify-between mb-6">
+        <div class="flex items-start justify-between mb-6 gap-3 flex-wrap">
           <div>
             <div class="text-xs font-bold text-on-surface-variant tracking-widest uppercase mb-1">Inventory Management</div>
             <h1 class="font-display text-2xl font-bold text-on-surface">Branch Vehicles</h1>
@@ -686,7 +719,7 @@
 
       <!-- ── CONSULTANTS ─────────────────────────────── -->
       <div id="page-consultants" class="page p-6">
-        <div class="flex items-start justify-between mb-6">
+        <div class="flex items-start justify-between mb-6 gap-3 flex-wrap">
           <div>
             <div class="text-xs font-bold text-on-surface-variant tracking-widest uppercase mb-1">Sales Team</div>
             <h1 class="font-display text-2xl font-bold text-on-surface">Sales Consultants</h1>
@@ -702,7 +735,7 @@
 
       <!-- ── ADMIN: USERS ───────────────────────────── -->
       <div id="page-users" class="page p-6">
-        <div class="flex items-start justify-between mb-6">
+        <div class="flex items-start justify-between mb-6 gap-3 flex-wrap">
           <div>
             <div class="text-xs font-bold text-on-surface-variant tracking-widest uppercase mb-1">Admin Panel</div>
             <h1 class="font-display text-2xl font-bold text-on-surface">Users</h1>
@@ -756,7 +789,7 @@
 
       <!-- ── ADMIN: MODELS & VARIANTS ──────────────── -->
       <div id="page-models" class="page p-6">
-        <div class="flex items-start justify-between mb-6">
+        <div class="flex items-start justify-between mb-6 gap-3 flex-wrap">
           <div>
             <div class="text-xs font-bold text-on-surface-variant tracking-widest uppercase mb-1">Admin Panel</div>
             <h1 class="font-display text-2xl font-bold text-on-surface">Car Models &amp; Variants</h1>
@@ -781,7 +814,7 @@
 
       <!-- ── ADMIN: BRANCHES ───────────────────────── -->
       <div id="page-branches" class="page p-6">
-        <div class="flex items-start justify-between mb-6">
+        <div class="flex items-start justify-between mb-6 gap-3 flex-wrap">
           <div>
             <div class="text-xs font-bold text-on-surface-variant tracking-widest uppercase mb-1">Admin Panel</div>
             <h1 class="font-display text-2xl font-bold text-on-surface">Branches</h1>
@@ -923,6 +956,18 @@ let currentUser = null;
 let selectedModelId = null;
 
 // ════════════════════════════════════════════════════════
+//  Mobile sidebar
+// ════════════════════════════════════════════════════════
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebar-overlay').classList.toggle('show');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('show');
+}
+
+// ════════════════════════════════════════════════════════
 //  Theme (dark / light)
 // ════════════════════════════════════════════════════════
 function applyTheme(theme) {
@@ -1010,6 +1055,7 @@ document.getElementById('login-form').addEventListener('submit', async e => {
 function logout() {
   localStorage.removeItem('token');
   currentUser = null;
+  closeSidebar();
   document.getElementById('login-screen').classList.add('active');
   document.getElementById('app').classList.add('hidden');
 }
@@ -1057,7 +1103,7 @@ function buildNav() {
     div.className = 'nav-item';
     div.dataset.page = item.id;
     div.innerHTML = `<span class="ms">${item.icon}</span><span>${item.label}</span>`;
-    div.addEventListener('click', () => navigate(item.id));
+    div.addEventListener('click', () => { navigate(item.id); closeSidebar(); });
     nav.appendChild(div);
   });
 
