@@ -444,18 +444,26 @@ app.get('/api/cluster-dashboard', auth, async (req, res) => {
       return res.json({ totalDrives: 0, totalDrivesAll: 0, totalCars: 0, totalConsultants: 0, modelStats: [], consultantStats: [], carKmStats: [], categoryStats: [], clusterBranches, clusterName: user.cluster_name, dateRange: { from: mtdFrom, to: mtdTo } });
     }
 
-    const [tdRow, tdAllRow, carsRow, consRow, modelStats, consultantStats, carKmStats, categoryStats] = await Promise.all([
+    const [tdRow, tdAllRow, carsRow, consRow, modelStats, modelVariantStats, consultantStats, carKmStats, categoryStats] = await Promise.all([
       q1(`SELECT COUNT(*)::int as c FROM test_drives WHERE branch_id = ANY($1::int[]) AND drive_date BETWEEN $2 AND $3`, [branchIds, mtdFrom, mtdTo]),
       q1(`SELECT COUNT(*)::int as c FROM test_drives WHERE branch_id = ANY($1::int[])`, [branchIds]),
       q1(`SELECT COUNT(*)::int as c FROM cars WHERE branch_id = ANY($1::int[])`, [branchIds]),
       q1(`SELECT COUNT(*)::int as c FROM sales_consultants WHERE active=true AND branch_id = ANY($1::int[])`, [branchIds]),
-      q(`SELECT m.brand, m.name as model_name, COUNT(td.id)::int as td_count
+      q(`SELECT m.id as model_id, m.brand, m.name as model_name, COUNT(td.id)::int as td_count
          FROM test_drives td
          JOIN cars c ON td.car_id = c.id
          JOIN car_variants cv ON c.variant_id = cv.id
          JOIN car_models m ON cv.model_id = m.id
          WHERE td.branch_id = ANY($1::int[]) AND td.drive_date BETWEEN $2 AND $3
          GROUP BY m.id, m.brand, m.name ORDER BY td_count DESC`, [branchIds, mtdFrom, mtdTo]),
+      q(`SELECT m.id as model_id, cv.fuel_type, cv.transmission, COUNT(td.id)::int as td_count
+         FROM test_drives td
+         JOIN cars c ON td.car_id = c.id
+         JOIN car_variants cv ON c.variant_id = cv.id
+         JOIN car_models m ON cv.model_id = m.id
+         WHERE td.branch_id = ANY($1::int[]) AND td.drive_date BETWEEN $2 AND $3
+         GROUP BY m.id, cv.fuel_type, cv.transmission
+         ORDER BY m.id, cv.fuel_type, cv.transmission`, [branchIds, mtdFrom, mtdTo]),
       q(`SELECT sc.first_name || ' ' || sc.last_name as name, sc.employee_id, b.name as branch_name, COUNT(td.id)::int as td_count
          FROM test_drives td
          JOIN sales_consultants sc ON td.consultant_id = sc.id
@@ -482,7 +490,7 @@ app.get('/api/cluster-dashboard', auth, async (req, res) => {
     res.json({
       totalDrives: tdRow?.c || 0, totalDrivesAll: tdAllRow?.c || 0,
       totalCars: carsRow?.c || 0, totalConsultants: consRow?.c || 0,
-      modelStats, consultantStats, carKmStats, categoryStats,
+      modelStats, modelVariantStats, consultantStats, carKmStats, categoryStats,
       clusterBranches, clusterName: user.cluster_name, dateRange: { from: mtdFrom, to: mtdTo },
     });
   } catch (e) { console.error(e); res.status(500).json({ error: e.message }); }
