@@ -683,37 +683,8 @@
           </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <!-- Left: form + table -->
-          <div class="lg:col-span-2">
-            <div class="card overflow-hidden">
-              <div class="overflow-x-auto" id="cars-table-body"></div>
-            </div>
-          </div>
-          <!-- Right: info panels -->
-          <div class="space-y-4">
-            <div class="preview-dark">
-              <span class="ms text-white mb-3" style="font-size:48px;font-variation-settings:'FILL' 0,'wght' 200,'GRAD' 0,'opsz' 48">directions_car</span>
-              <div class="text-xs text-gray-400 tracking-widest uppercase">Live Preview</div>
-              <div class="text-white text-sm mt-1 font-medium" id="car-preview-text">Select a vehicle</div>
-            </div>
-            <div class="card p-4">
-              <div class="font-semibold text-on-surface text-sm mb-3 flex items-center gap-2">
-                <span class="ms text-secondary" style="font-size:18px">info</span> Compliance Check
-              </div>
-              <div class="space-y-2">
-                <div class="flex items-center gap-2 text-xs text-on-surface-variant">
-                  <span class="ms text-green-600" style="font-size:16px">check_circle</span> Registration verified on entry
-                </div>
-                <div class="flex items-center gap-2 text-xs text-on-surface-variant">
-                  <span class="ms text-green-600" style="font-size:16px">check_circle</span> Variant linked to admin models
-                </div>
-                <div class="flex items-center gap-2 text-xs text-on-surface-variant">
-                  <span class="ms text-on-surface-variant" style="font-size:16px">radio_button_unchecked</span> Insurance upload (next step)
-                </div>
-              </div>
-            </div>
-          </div>
+        <div class="card overflow-hidden">
+          <div class="overflow-x-auto" id="cars-table-body"></div>
         </div>
       </div>
 
@@ -1371,7 +1342,7 @@ async function showAddCarModal() {
         <label class="form-label">Registration Number *</label>
         <div class="field-wrap">
           <span class="ms field-icon">pin</span>
-          <input type="text" id="car-regd" class="form-input has-icon mono" placeholder="e.g. KL09AB1234" required style="text-transform:uppercase" />
+          <input type="text" id="car-regd" class="form-input has-icon mono" placeholder="e.g. KL09AB1234" required maxlength="10" minlength="10" style="text-transform:uppercase" />
         </div>
       </div>
       <div>
