@@ -1323,18 +1323,23 @@ async function loadCars() {
     const isAdmin = currentUser.role === 'admin';
     el.innerHTML = `<table class="data-table">
       <thead><tr>
-        <th>Reg. No.</th><th>Brand / Model</th><th>Variant</th><th>Fuel</th><th>Trans.</th><th>Status</th>
-        ${isAdmin ? '<th></th>' : ''}
+        <th>Reg. No.</th><th>Model</th><th>Fuel</th><th>Trans.</th><th>DN Cut Date</th><th>Regd. Date</th><th>Status</th><th></th>
       </tr></thead>
       <tbody>
         ${cars.map(c => `<tr>
           <td class="mono font-medium" style="font-size:13px">${c.regd_no}</td>
-          <td><div class="font-medium text-on-surface">${c.brand}</div><div style="font-size:11px;color:var(--text-faint)">${c.model_name}</div></td>
-          <td>${c.variant_name}</td>
-          <td>${c.fuel_type}</td>
-          <td>${c.transmission}</td>
+          <td class="font-medium text-on-surface">${c.model_name}</td>
+          <td style="font-size:12px">${c.fuel_type}</td>
+          <td style="font-size:12px">${c.transmission}</td>
+          <td style="font-size:12px;color:var(--text-muted)">${c.dn_cut_date ? c.dn_cut_date.split('T')[0] : '—'}</td>
+          <td style="font-size:12px;color:var(--text-muted)">${c.regd_date ? c.regd_date.split('T')[0] : '—'}</td>
           <td><span class="badge ${c.status==='available'?'badge-green':c.status==='in_use'?'badge-amber':'badge-gray'}">${c.status}</span></td>
-          ${isAdmin ? `<td><button class="btn btn-danger btn-sm" onclick="deleteCar(${c.id})"><span class="ms" style="font-size:16px">delete</span></button></td>` : ''}
+          <td>
+            <div class="flex gap-1">
+              <button class="btn btn-outline btn-sm" onclick='showEditCarModal(${JSON.stringify(c)})'><span class="ms" style="font-size:16px">edit</span></button>
+              ${isAdmin ? `<button class="btn btn-danger btn-sm" onclick="deleteCar(${c.id})"><span class="ms" style="font-size:16px">delete</span></button>` : ''}
+            </div>
+          </td>
         </tr>`).join('')}
       </tbody>
     </table>`;
@@ -1356,17 +1361,17 @@ async function showAddCarModal() {
         </select></div>
       </div>` : `<input type="hidden" id="car-branch" value="${currentUser.branch_id}" />`}
       <div>
-        <label class="form-label">Vehicle Variant *</label>
+        <label class="form-label">Vehicle *</label>
         <div class="select-wrap"><select id="car-variant" class="form-input" required>
-          <option value="">Select Variant…</option>
-          ${variants.map(v => `<option value="${v.id}">${v.brand} ${v.model_name} — ${v.name} (${v.fuel_type}, ${v.transmission})</option>`).join('')}
+          <option value="">Select Model…</option>
+          ${variants.map(v => `<option value="${v.id}">${v.model_name} (${v.fuel_type}, ${v.transmission})</option>`).join('')}
         </select></div>
       </div>
       <div>
         <label class="form-label">Registration Number *</label>
         <div class="field-wrap">
           <span class="ms field-icon">pin</span>
-          <input type="text" id="car-regd" class="form-input has-icon mono" placeholder="e.g. MH12AB1234" required style="text-transform:uppercase" />
+          <input type="text" id="car-regd" class="form-input has-icon mono" placeholder="e.g. KL09AB1234" required style="text-transform:uppercase" />
         </div>
       </div>
       <div>
@@ -1376,6 +1381,16 @@ async function showAddCarModal() {
           ${['White','Black','Silver','Grey','Red','Blue','Brown','Orange','Yellow','Green'].map(c => `<option>${c}</option>`).join('')}
         </select></div>
       </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="form-label">DN Cut Date</label>
+          <input type="date" id="car-dn-date" class="form-input" />
+        </div>
+        <div>
+          <label class="form-label">Regd. Date</label>
+          <input type="date" id="car-regd-date" class="form-input" />
+        </div>
+      </div>
       <div class="flex gap-3 pt-2">
         <button type="button" class="btn btn-outline" onclick="closeModal()">Cancel</button>
         <button type="submit" class="btn btn-primary flex-1 justify-center">Complete Registration</button>
@@ -1384,10 +1399,12 @@ async function showAddCarModal() {
     showModal('Register New Vehicle', html, async () => {
       try {
         await post('/cars', {
-          variant_id: document.getElementById('car-variant').value,
-          branch_id:  document.getElementById('car-branch').value,
-          regd_no:    document.getElementById('car-regd').value,
-          color:      document.getElementById('car-color').value || null,
+          variant_id:  document.getElementById('car-variant').value,
+          branch_id:   document.getElementById('car-branch').value,
+          regd_no:     document.getElementById('car-regd').value,
+          color:       document.getElementById('car-color').value || null,
+          dn_cut_date: document.getElementById('car-dn-date').value || null,
+          regd_date:   document.getElementById('car-regd-date').value || null,
         });
         toast('Vehicle registered!'); closeModal(); loadCars();
       } catch(err) { toast(err.message, 'error'); }
@@ -1399,6 +1416,61 @@ async function deleteCar(id) {
   if (!confirm('Delete this vehicle?')) return;
   try { await del('/cars/' + id); toast('Vehicle deleted'); loadCars(); }
   catch(e) { toast(e.message, 'error'); }
+}
+
+async function showEditCarModal(c) {
+  const colours = ['White','Black','Silver','Grey','Red','Blue','Brown','Orange','Yellow','Green'];
+  const dnDate   = c.dn_cut_date ? c.dn_cut_date.split('T')[0] : '';
+  const regdDate = c.regd_date   ? c.regd_date.split('T')[0]   : '';
+  const html = `<form class="space-y-4">
+    <div class="flex items-center gap-3 p-3 rounded-lg" style="background:var(--bg)">
+      <span class="ms text-secondary" style="font-size:22px">directions_car</span>
+      <div>
+        <div class="font-semibold text-on-surface mono">${c.regd_no}</div>
+        <div style="font-size:12px;color:var(--text-muted)">${c.model_name} · ${c.fuel_type} · ${c.transmission}</div>
+      </div>
+    </div>
+    <div>
+      <label class="form-label">Status</label>
+      <div class="select-wrap"><select id="ec-status" class="form-input">
+        <option value="available"    ${c.status==='available'   ?'selected':''}>Available</option>
+        <option value="in_use"       ${c.status==='in_use'      ?'selected':''}>In Use</option>
+        <option value="maintenance"  ${c.status==='maintenance' ?'selected':''}>Maintenance</option>
+      </select></div>
+    </div>
+    <div>
+      <label class="form-label">Exterior Colour</label>
+      <div class="select-wrap"><select id="ec-color" class="form-input">
+        <option value="">Not specified</option>
+        ${colours.map(col => `<option ${c.color===col?'selected':''}>${col}</option>`).join('')}
+      </select></div>
+    </div>
+    <div class="grid grid-cols-2 gap-3">
+      <div>
+        <label class="form-label">DN Cut Date</label>
+        <input type="date" id="ec-dn-date" class="form-input" value="${dnDate}" />
+      </div>
+      <div>
+        <label class="form-label">Regd. Date</label>
+        <input type="date" id="ec-regd-date" class="form-input" value="${regdDate}" />
+      </div>
+    </div>
+    <div class="flex gap-3 pt-2">
+      <button type="button" class="btn btn-outline" onclick="closeModal()">Cancel</button>
+      <button type="submit" class="btn btn-primary flex-1 justify-center">Save Changes</button>
+    </div>
+  </form>`;
+  showModal('Edit Vehicle', html, async () => {
+    try {
+      await put('/cars/' + c.id, {
+        status:      document.getElementById('ec-status').value,
+        color:       document.getElementById('ec-color').value   || null,
+        dn_cut_date: document.getElementById('ec-dn-date').value || null,
+        regd_date:   document.getElementById('ec-regd-date').value || null,
+      });
+      toast('Vehicle updated!'); closeModal(); loadCars();
+    } catch(err) { toast(err.message, 'error'); }
+  });
 }
 
 // ════════════════════════════════════════════════════════

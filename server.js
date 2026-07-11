@@ -241,13 +241,15 @@ app.get('/api/cars', auth, async (req, res) => {
 });
 
 app.post('/api/cars', auth, async (req, res) => {
-  const { variant_id, branch_id, regd_no, color } = req.body;
+  const { variant_id, branch_id, regd_no, color, dn_cut_date, regd_date } = req.body;
   if (!variant_id || !branch_id || !regd_no) return res.status(400).json({ error: 'variant_id, branch_id, regd_no required' });
   if (req.user.role === 'coordinator' && parseInt(branch_id) !== req.user.branch_id)
     return res.status(403).json({ error: 'Can only add cars to your own branch' });
   try {
-    const row = await q1(`INSERT INTO cars (variant_id, branch_id, regd_no, color) VALUES ($1,$2,$3,$4) RETURNING *`,
-      [variant_id, branch_id, regd_no.toUpperCase(), color||null]);
+    const row = await q1(
+      `INSERT INTO cars (variant_id, branch_id, regd_no, color, dn_cut_date, regd_date) VALUES ($1,$2,$3,$4,$5,$6) RETURNING *`,
+      [variant_id, branch_id, regd_no.toUpperCase(), color||null, dn_cut_date||null, regd_date||null]
+    );
     res.status(201).json(row);
   } catch (e) {
     if (e.code === '23505') return res.status(409).json({ error: 'Registration number already exists' });
@@ -256,14 +258,16 @@ app.post('/api/cars', auth, async (req, res) => {
 });
 
 app.put('/api/cars/:id', auth, async (req, res) => {
-  const { regd_no, color, status } = req.body;
+  const { regd_no, color, status, dn_cut_date, regd_date } = req.body;
   try {
     const car = await q1(`SELECT * FROM cars WHERE id = $1`, [req.params.id]);
     if (!car) return res.status(404).json({ error: 'Car not found' });
     if (req.user.role === 'coordinator' && car.branch_id !== req.user.branch_id)
       return res.status(403).json({ error: 'Access denied' });
-    await q(`UPDATE cars SET regd_no=COALESCE($1,regd_no), color=COALESCE($2,color), status=COALESCE($3,status) WHERE id=$4`,
-      [regd_no?.toUpperCase(), color, status, req.params.id]);
+    await q(
+      `UPDATE cars SET regd_no=COALESCE($1,regd_no), color=COALESCE($2,color), status=COALESCE($3,status), dn_cut_date=$4, regd_date=$5 WHERE id=$6`,
+      [regd_no?.toUpperCase()||null, color||null, status||null, dn_cut_date||null, regd_date||null, req.params.id]
+    );
     res.json({ ok: true });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
