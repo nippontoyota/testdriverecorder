@@ -252,7 +252,7 @@ app.post('/api/cars', auth, async (req, res) => {
     );
     res.status(201).json(row);
   } catch (e) {
-    if (e.code === '23505') return res.status(409).json({ error: 'Registration number already exists' });
+    if (e.code === '23505') return res.status(409).json({ error: 'This registration number is already registered for this branch' });
     res.status(500).json({ error: e.message });
   }
 });
