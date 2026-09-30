@@ -272,9 +272,17 @@ app.put('/api/cars/:id', auth, async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-app.delete('/api/cars/:id', auth, adminOnly, async (req, res) => {
-  try { await q(`DELETE FROM cars WHERE id = $1`, [req.params.id]); res.json({ ok: true }); }
-  catch (e) { res.status(500).json({ error: e.message }); }
+app.delete('/api/cars/:id', auth, async (req, res) => {
+  try {
+    if (req.user.role === 'coordinator') {
+      const car = await q1(`SELECT branch_id FROM cars WHERE id=$1`, [req.params.id]);
+      if (!car || car.branch_id !== req.user.branch_id) return res.status(403).json({ error: 'Cannot delete a vehicle from another branch' });
+    } else if (req.user.role !== 'admin') {
+      return res.status(403).json({ error: 'Not authorised' });
+    }
+    await q(`DELETE FROM cars WHERE id = $1`, [req.params.id]);
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 // ── consultants ───────────────────────────────────────────────────────────────
@@ -314,9 +322,17 @@ app.put('/api/consultants/:id', auth, adminOnly, async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-app.delete('/api/consultants/:id', auth, adminOnly, async (req, res) => {
-  try { await q(`DELETE FROM sales_consultants WHERE id = $1`, [req.params.id]); res.json({ ok: true }); }
-  catch (e) { res.status(500).json({ error: e.message }); }
+app.delete('/api/consultants/:id', auth, async (req, res) => {
+  try {
+    if (req.user.role === 'coordinator') {
+      const c = await q1(`SELECT branch_id FROM sales_consultants WHERE id=$1`, [req.params.id]);
+      if (!c || c.branch_id !== req.user.branch_id) return res.status(403).json({ error: 'Cannot delete a consultant from another branch' });
+    } else if (req.user.role !== 'admin') {
+      return res.status(403).json({ error: 'Not authorised' });
+    }
+    await q(`DELETE FROM sales_consultants WHERE id = $1`, [req.params.id]);
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 // ── test drives ───────────────────────────────────────────────────────────────
@@ -494,6 +510,48 @@ app.get('/api/cluster-dashboard', auth, async (req, res) => {
       clusterBranches, clusterName: user.cluster_name, dateRange: { from: mtdFrom, to: mtdTo },
     });
   } catch (e) { console.error(e); res.status(500).json({ error: e.message }); }
+});
+
+// ── Public routes (no auth — QR form) ────────────────────────────────────────
+
+app.get('/api/public/car/:id', async (req, res) => {
+  try {
+    const car = await q1(`SELECT c.id, c.regd_no, m.brand, m.name as model_name, cv.fuel_type, cv.transmission, c.branch_id, b.name as branch_name
+      FROM cars c JOIN car_variants cv ON c.variant_id=cv.id JOIN car_models m ON cv.model_id=m.id JOIN branches b ON c.branch_id=b.id
+      WHERE c.id=$1`, [req.params.id]);
+    if (!car) return res.status(404).json({ error: 'Vehicle not found' });
+    res.json(car);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.get('/api/public/branches', async (req, res) => {
+  try { res.json(await q(`SELECT id, name FROM branches ORDER BY name`)); }
+  catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.get('/api/public/consultants', async (req, res) => {
+  const { branch_id } = req.query;
+  if (!branch_id) return res.status(400).json({ error: 'branch_id required' });
+  try {
+    res.json(await q(`SELECT id, first_name, last_name, employee_id FROM sales_consultants WHERE branch_id=$1 AND active=true ORDER BY first_name`, [branch_id]));
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.post('/api/public/test-drive', async (req, res) => {
+  const { car_id, branch_id, consultant_id, slip_id, customer_name, customer_phone, drive_date, category, activity_name, showroom_type, kms_in, kms_out, remarks } = req.body;
+  if (!car_id || !branch_id || !consultant_id || !customer_name || !customer_phone || !drive_date || !category || !showroom_type ||
+      kms_in === undefined || kms_in === null || kms_in === '' || kms_out === undefined || kms_out === null || kms_out === '')
+    return res.status(400).json({ error: 'All required fields must be filled' });
+  if (category === 'Activity' && !activity_name)
+    return res.status(400).json({ error: 'Activity name is required for Activity category' });
+  try {
+    const row = await q1(
+      `INSERT INTO test_drives (branch_id, car_id, consultant_id, slip_id, customer_name, customer_phone, drive_date, category, activity_name, showroom_type, kms_in, kms_out, remarks)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13) RETURNING id`,
+      [branch_id, car_id, consultant_id, slip_id||null, customer_name, customer_phone, drive_date, category, category==='Activity'?activity_name:null, showroom_type, kms_in, kms_out, remarks||null]
+    );
+    res.status(201).json({ ok: true, id: row.id });
+  } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 // ── SPA fallback ──────────────────────────────────────────────────────────────

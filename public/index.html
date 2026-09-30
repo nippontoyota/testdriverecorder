@@ -15,6 +15,7 @@
   </script>
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;450;500&display=swap" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
   <script>
@@ -1292,7 +1293,7 @@ async function loadCars() {
       el.innerHTML = '<div class="p-10 text-center text-on-surface-variant text-sm">No vehicles registered yet. Click "Register Vehicle".</div>';
       return;
     }
-    const isAdmin = currentUser.role === 'admin';
+    const canDelete = currentUser.role === 'admin' || currentUser.role === 'coordinator';
     el.innerHTML = `<table class="data-table">
       <thead><tr>
         <th>Reg. No.</th><th>Model</th><th>Fuel</th><th>Trans.</th><th>DN Cut Date</th><th>Regd. Date</th><th>Status</th><th></th>
@@ -1308,8 +1309,9 @@ async function loadCars() {
           <td><span class="badge ${c.status==='available'?'badge-green':c.status==='in_use'?'badge-amber':'badge-gray'}">${c.status}</span></td>
           <td>
             <div class="flex gap-1">
+              <button class="btn btn-outline btn-sm" title="QR Code" onclick='showQRModal(${c.id}, "${c.regd_no}")'><span class="ms" style="font-size:16px">qr_code</span></button>
               <button class="btn btn-outline btn-sm" onclick='showEditCarModal(${JSON.stringify(c)})'><span class="ms" style="font-size:16px">edit</span></button>
-              ${isAdmin ? `<button class="btn btn-danger btn-sm" onclick="deleteCar(${c.id})"><span class="ms" style="font-size:16px">delete</span></button>` : ''}
+              ${canDelete ? `<button class="btn btn-danger btn-sm" onclick="deleteCar(${c.id})"><span class="ms" style="font-size:16px">delete</span></button>` : ''}
             </div>
           </td>
         </tr>`).join('')}
@@ -1456,16 +1458,16 @@ async function loadConsultants() {
       el.innerHTML = '<div class="p-10 text-center text-on-surface-variant text-sm">No consultants yet. Click "Add Consultant".</div>';
       return;
     }
-    const isAdmin = currentUser.role === 'admin';
+    const canDelete = currentUser.role === 'admin' || currentUser.role === 'coordinator';
     el.innerHTML = `<table class="data-table">
-      <thead><tr><th>Employee ID</th><th>Name</th><th>Type</th><th>Branch</th>${isAdmin?'<th></th>':''}</tr></thead>
+      <thead><tr><th>Employee ID</th><th>Name</th><th>Type</th><th>Branch</th>${canDelete?'<th></th>':''}</tr></thead>
       <tbody>
         ${cs.map(c => `<tr>
           <td class="mono" style="font-size:12px">${c.employee_id}</td>
           <td class="font-medium text-on-surface">${c.first_name} ${c.last_name}</td>
           <td><span class="badge badge-gray">${c.type}</span></td>
           <td style="font-size:13px">${c.branch_name}</td>
-          ${isAdmin?`<td><button class="btn btn-danger btn-sm" onclick="deleteConsultant(${c.id})"><span class="ms" style="font-size:16px">delete</span></button></td>`:''}
+          ${canDelete?`<td><button class="btn btn-danger btn-sm" onclick="deleteConsultant(${c.id})"><span class="ms" style="font-size:16px">delete</span></button></td>`:''}
         </tr>`).join('')}
       </tbody>
     </table>`;
@@ -2033,6 +2035,42 @@ async function loadClusterDashboard() {
 function applyClusterFilter() {
   cdBranchesLoaded = true; // keep existing branch options
   loadClusterDashboard();
+}
+
+// ════════════════════════════════════════════════════════
+//  QR Code
+// ════════════════════════════════════════════════════════
+
+function showQRModal(carId, regdNo) {
+  const url = `${window.location.origin}/td-form?car_id=${carId}`;
+  showModal(`QR Code — ${regdNo}`, `
+    <div class="space-y-4">
+      <div id="qr-output" class="flex justify-center p-4 bg-white rounded-xl"></div>
+      <div class="text-xs text-on-surface-variant text-center break-all px-2">${url}</div>
+      <div class="flex gap-2 pt-1">
+        <button class="btn btn-outline flex-1 justify-center" onclick="navigator.clipboard.writeText('${url}').then(()=>toast('Link copied!'))">
+          <span class="ms" style="font-size:16px">content_copy</span> Copy Link
+        </button>
+        <button class="btn btn-primary flex-1 justify-center" onclick="downloadQR('${regdNo}')">
+          <span class="ms" style="font-size:16px">download</span> Download
+        </button>
+      </div>
+    </div>
+  `);
+  setTimeout(() => {
+    const el = document.getElementById('qr-output');
+    if (!el) return;
+    new QRCode(el, { text: url, width: 200, height: 200, colorDark: '#000000', colorLight: '#ffffff' });
+  }, 50);
+}
+
+function downloadQR(regdNo) {
+  const img = document.querySelector('#qr-output img');
+  if (!img) { toast('QR not ready yet', 'error'); return; }
+  const a = document.createElement('a');
+  a.href = img.src;
+  a.download = `qr-${regdNo}.png`;
+  a.click();
 }
 
 // ════════════════════════════════════════════════════════

@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Test Drive Entry — Nippon Toyota</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Symbols+Outlined" rel="stylesheet" />
+  <style>
+    body { background: #f1f5f9; font-family: system-ui, -apple-system, sans-serif; }
+    .ms { font-family: 'Material Symbols Outlined'; font-weight: normal; font-style: normal; font-size: 20px; line-height: 1; letter-spacing: normal; text-transform: none; display: inline-block; white-space: nowrap; vertical-align: middle; }
+    .field { border: 1.5px solid #e2e8f0; border-radius: 10px; padding: 10px 14px; width: 100%; font-size: 14px; color: #1e293b; background: #fff; transition: border-color .15s, box-shadow .15s; outline: none; }
+    .field:focus { border-color: #0051d5; box-shadow: 0 0 0 3px rgba(0,81,213,.1); }
+    select.field { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='%2394a3b8'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 36px; }
+    .lbl { display: block; font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: #64748b; margin-bottom: 6px; }
+    .cat-btn input[type=radio] { display: none; }
+    .cat-btn label { display: block; text-align: center; padding: 8px 4px; border: 1.5px solid #e2e8f0; border-radius: 9px; font-size: 10px; font-weight: 700; cursor: pointer; color: #64748b; transition: all .15s; letter-spacing: .03em; }
+    .cat-btn input[type=radio]:checked + label { background: #0051d5; border-color: #0051d5; color: #fff; }
+    .btn-submit { width: 100%; background: #0051d5; color: #fff; font-weight: 700; font-size: 14px; padding: 14px; border-radius: 12px; border: none; cursor: pointer; transition: background .15s; display: flex; align-items: center; justify-content: center; gap: 6px; }
+    .btn-submit:hover { background: #0040aa; }
+    .btn-submit:disabled { background: #94a3b8; cursor: not-allowed; }
+    .spinner { width: 24px; height: 24px; border: 2.5px solid #bfdbfe; border-top-color: #0051d5; border-radius: 50%; animation: spin .7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body class="min-h-screen py-6 px-4">
+
+  <!-- Loading -->
+  <div id="screen-loading" class="max-w-lg mx-auto flex flex-col items-center justify-center py-24">
+    <div class="spinner mb-4"></div>
+    <p class="text-slate-500 text-sm">Loading vehicle details…</p>
+  </div>
+
+  <!-- Error -->
+  <div id="screen-error" class="max-w-lg mx-auto hidden">
+    <div class="bg-white rounded-2xl p-10 text-center shadow-sm">
+      <span class="ms text-red-400" style="font-size:52px">error_outline</span>
+      <h2 class="text-lg font-bold mt-3 text-slate-800">Vehicle Not Found</h2>
+      <p class="text-slate-500 text-sm mt-1">This QR code may be invalid or the vehicle has been removed.</p>
+    </div>
+  </div>
+
+  <!-- Main form -->
+  <div id="screen-main" class="max-w-lg mx-auto hidden">
+    <!-- Header -->
+    <div class="text-center mb-5">
+      <div class="text-base font-bold text-slate-700 tracking-tight">Nippon Toyota</div>
+      <h1 class="text-2xl font-bold text-slate-900 mt-0.5">Test Drive Entry</h1>
+      <p class="text-slate-500 text-sm mt-1">Fill in all details before the test drive begins</p>
+    </div>
+
+    <!-- Car Banner -->
+    <div class="rounded-2xl p-4 mb-5 flex items-center gap-4" style="background:linear-gradient(135deg,#0051d5,#0070f3)">
+      <span class="ms text-white" style="font-size:44px;opacity:.85">directions_car</span>
+      <div>
+        <div id="car-model" class="font-bold text-lg text-white leading-tight"></div>
+        <div id="car-specs" class="text-blue-100 text-sm mt-0.5"></div>
+        <div id="car-regno" class="font-mono text-sm text-blue-200 mt-0.5 tracking-wider"></div>
+      </div>
+    </div>
+
+    <!-- Form card -->
+    <div class="bg-white rounded-2xl shadow-sm p-5 space-y-4">
+
+      <!-- Branch -->
+      <div>
+        <label class="lbl">Branch *</label>
+        <select id="f-branch" class="field" required onchange="loadConsultants()">
+          <option value="">Select Branch…</option>
+        </select>
+      </div>
+
+      <!-- Sales Consultant -->
+      <div>
+        <label class="lbl">Sales Consultant *</label>
+        <select id="f-consultant" class="field" required>
+          <option value="">Select Branch First…</option>
+        </select>
+      </div>
+
+      <!-- Date + Slip -->
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="lbl">Date *</label>
+          <input type="date" id="f-date" class="field" required />
+        </div>
+        <div>
+          <label class="lbl">TD Slip ID</label>
+          <input type="text" id="f-slip" class="field" placeholder="e.g. TD-0001" />
+        </div>
+      </div>
+
+      <!-- Customer Name -->
+      <div>
+        <label class="lbl">Customer Name *</label>
+        <input type="text" id="f-name" class="field" placeholder="Full name" required />
+      </div>
+
+      <!-- Customer Phone -->
+      <div>
+        <label class="lbl">Customer Phone *</label>
+        <input type="tel" id="f-phone" class="field" placeholder="+91 98765 43210" required />
+      </div>
+
+      <!-- Showroom Type -->
+      <div>
+        <label class="lbl">Showroom Type *</label>
+        <select id="f-showroom" class="field">
+          <option value="Showroom">Showroom TD</option>
+          <option value="Home TD">Home TD</option>
+        </select>
+      </div>
+
+      <!-- KMS -->
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="lbl">KMS Out *</label>
+          <input type="number" step="0.1" id="f-kmsout" class="field" placeholder="e.g. 12450" required />
+        </div>
+        <div>
+          <label class="lbl">KMS In *</label>
+          <input type="number" step="0.1" id="f-kmsin" class="field" placeholder="e.g. 12480" required />
+        </div>
+      </div>
+
+      <!-- TD Category -->
+      <div>
+        <label class="lbl">TD Category *</label>
+        <div class="grid grid-cols-3 gap-2">
+          <div class="cat-btn"><input type="radio" name="f-cat" id="fc1" value="Test Drive" checked onchange="toggleActivity()" /><label for="fc1">TEST DRIVE</label></div>
+          <div class="cat-btn"><input type="radio" name="f-cat" id="fc2" value="Activity" onchange="toggleActivity()" /><label for="fc2">ACTIVITY</label></div>
+          <div class="cat-btn"><input type="radio" name="f-cat" id="fc3" value="Experience" onchange="toggleActivity()" /><label for="fc3">EXPERIENCE</label></div>
+          <div class="cat-btn"><input type="radio" name="f-cat" id="fc4" value="Repeat Drive" onchange="toggleActivity()" /><label for="fc4">REPEAT DRIVE</label></div>
+          <div class="cat-btn"><input type="radio" name="f-cat" id="fc5" value="Connected Rides" onchange="toggleActivity()" /><label for="fc5">CONNECTED RIDES</label></div>
+          <div class="cat-btn"><input type="radio" name="f-cat" id="fc6" value="Others" onchange="toggleActivity()" /><label for="fc6">OTHERS</label></div>
+        </div>
+      </div>
+
+      <!-- Activity Name (hidden unless Activity selected) -->
+      <div id="f-activity-wrap" style="display:none">
+        <label class="lbl">Activity Name *</label>
+        <input type="text" id="f-activity" class="field" placeholder="e.g. Weekend Drive Camp" />
+      </div>
+
+      <!-- Remarks -->
+      <div>
+        <label class="lbl">Remarks</label>
+        <textarea id="f-remarks" class="field" rows="3" placeholder="Route preference, customer expectations, vehicle conditions…"></textarea>
+      </div>
+
+      <!-- Submit -->
+      <button id="f-submit" class="btn-submit" onclick="submitForm()">
+        <span class="ms" style="font-size:18px">check_circle</span>
+        Submit Test Drive Entry
+      </button>
+    </div>
+
+    <p class="text-center text-xs text-slate-400 mt-5 pb-6">Nippon Toyota Test Drive Management System</p>
+  </div>
+
+  <!-- Success -->
+  <div id="screen-success" class="max-w-lg mx-auto hidden">
+    <div class="bg-white rounded-2xl p-10 text-center shadow-sm">
+      <div class="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-4">
+        <span class="ms text-green-500" style="font-size:38px">check_circle</span>
+      </div>
+      <h2 class="text-xl font-bold text-slate-800">Entry Recorded!</h2>
+      <p class="text-slate-500 text-sm mt-2">The test drive has been successfully saved.</p>
+      <button onclick="resetForm()" class="mt-6 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-7 py-3 rounded-xl text-sm transition-colors">
+        Add Another Entry
+      </button>
+    </div>
+  </div>
+
+<script>
+  let carId = null;
+  let carData = null;
+
+  function show(id) {
+    ['screen-loading','screen-error','screen-main','screen-success'].forEach(s => {
+      document.getElementById(s).classList.toggle('hidden', s !== id);
+    });
+  }
+
+  async function api(url, opts = {}) {
+    const res = await fetch(url, { headers: { 'Content-Type': 'application/json' }, ...opts });
+    if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e.error || 'Request failed'); }
+    return res.json();
+  }
+
+  async function init() {
+    const params = new URLSearchParams(location.search);
+    carId = params.get('car_id');
+    if (!carId) { show('screen-error'); return; }
+    try {
+      carData = await api(`/api/public/car/${carId}`);
+      document.getElementById('car-model').textContent = `${carData.brand} ${carData.model_name}`;
+      document.getElementById('car-specs').textContent = `${carData.fuel_type} · ${carData.transmission}`;
+      document.getElementById('car-regno').textContent = carData.regd_no;
+
+      const branches = await api('/api/public/branches');
+      const sel = document.getElementById('f-branch');
+      branches.forEach(b => {
+        const o = document.createElement('option');
+        o.value = b.id; o.textContent = b.name;
+        if (b.id === carData.branch_id) o.selected = true;
+        sel.appendChild(o);
+      });
+
+      document.getElementById('f-date').value = new Date().toISOString().split('T')[0];
+
+      if (carData.branch_id) await loadConsultants();
+
+      show('screen-main');
+    } catch(e) { show('screen-error'); }
+  }
+
+  async function loadConsultants() {
+    const branchId = document.getElementById('f-branch').value;
+    const sel = document.getElementById('f-consultant');
+    sel.innerHTML = '<option value="">Loading…</option>';
+    if (!branchId) { sel.innerHTML = '<option value="">Select Branch First…</option>'; return; }
+    try {
+      const cs = await api(`/api/public/consultants?branch_id=${branchId}`);
+      if (!cs.length) {
+        sel.innerHTML = '<option value="">No consultants for this branch</option>';
+      } else {
+        sel.innerHTML = '<option value="">Select Consultant…</option>' +
+          cs.map(c => `<option value="${c.id}">${c.first_name} ${c.last_name} (${c.employee_id})</option>`).join('');
+      }
+    } catch(e) { sel.innerHTML = '<option value="">Error loading consultants</option>'; }
+  }
+
+  function toggleActivity() {
+    const cat = document.querySelector('input[name="f-cat"]:checked')?.value;
+    document.getElementById('f-activity-wrap').style.display = cat === 'Activity' ? '' : 'none';
+  }
+
+  async function submitForm() {
+    const branch_id     = document.getElementById('f-branch').value;
+    const consultant_id = document.getElementById('f-consultant').value;
+    const drive_date    = document.getElementById('f-date').value;
+    const customer_name = document.getElementById('f-name').value.trim();
+    const customer_phone = document.getElementById('f-phone').value.trim();
+    const showroom_type = document.getElementById('f-showroom').value;
+    const kms_out       = document.getElementById('f-kmsout').value;
+    const kms_in        = document.getElementById('f-kmsin').value;
+    const category      = document.querySelector('input[name="f-cat"]:checked')?.value;
+    const activity_name = document.getElementById('f-activity').value.trim();
+    const slip_id       = document.getElementById('f-slip').value.trim();
+    const remarks       = document.getElementById('f-remarks').value.trim();
+
+    if (!branch_id)      return alert('Please select a branch.');
+    if (!consultant_id)  return alert('Please select a sales consultant.');
+    if (!drive_date)     return alert('Please enter the test drive date.');
+    if (!customer_name)  return alert('Please enter the customer name.');
+    if (!customer_phone) return alert('Please enter the customer phone number.');
+    if (!kms_out)        return alert('Please enter KMS Out reading.');
+    if (!kms_in)         return alert('Please enter KMS In reading.');
+    if (category === 'Activity' && !activity_name) return alert('Please enter an Activity Name.');
+
+    const btn = document.getElementById('f-submit');
+    btn.disabled = true;
+    btn.innerHTML = '<div class="spinner" style="border-color:#bfdbfe;border-top-color:#fff"></div> Saving…';
+
+    try {
+      await api('/api/public/test-drive', {
+        method: 'POST',
+        body: JSON.stringify({
+          car_id: carId, branch_id, consultant_id, drive_date, customer_name, customer_phone,
+          showroom_type, kms_in, kms_out, category,
+          activity_name: category === 'Activity' ? activity_name : null,
+          slip_id: slip_id || null, remarks: remarks || null,
+        }),
+      });
+      show('screen-success');
+    } catch(e) {
+      alert('Error: ' + e.message);
+      btn.disabled = false;
+      btn.innerHTML = '<span class="ms" style="font-size:18px">check_circle</span> Submit Test Drive Entry';
+    }
+  }
+
+  function resetForm() {
+    ['f-name','f-phone','f-slip','f-kmsout','f-kmsin','f-remarks','f-activity'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+    document.getElementById('f-activity-wrap').style.display = 'none';
+    document.querySelector('input[name="f-cat"][value="Test Drive"]').checked = true;
+    document.getElementById('f-date').value = new Date().toISOString().split('T')[0];
+    const btn = document.getElementById('f-submit');
+    btn.disabled = false;
+    btn.innerHTML = '<span class="ms" style="font-size:18px">check_circle</span> Submit Test Drive Entry';
+    show('screen-main');
+  }
+
+  init();
+</script>
+</body>
+</html>
