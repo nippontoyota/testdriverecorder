@@ -554,6 +554,10 @@ app.post('/api/public/test-drive', async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
+// ── Public pages ─────────────────────────────────────────────────────────────
+
+app.get('/td-form', (req, res) => res.sendFile(path.join(__dirname, 'public', 'td-form.html')));
+
 // ── SPA fallback ──────────────────────────────────────────────────────────────
 
 app.get('*', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
