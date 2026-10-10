@@ -512,6 +512,65 @@ app.get('/api/cluster-dashboard', auth, async (req, res) => {
   } catch (e) { console.error(e); res.status(500).json({ error: e.message }); }
 });
 
+// ── Branch dashboard (coordinator / admin) ───────────────────────────────────
+
+app.get('/api/branch-dashboard', auth, async (req, res) => {
+  try {
+    if (req.user.role !== 'coordinator' && req.user.role !== 'admin')
+      return res.status(403).json({ error: 'Not authorised' });
+
+    const branchId = req.user.role === 'coordinator' ? req.user.branch_id : parseInt(req.query.branch_id);
+    if (!branchId) return res.status(400).json({ error: 'branch_id required' });
+
+    const today = new Date();
+    const { date_from, date_to } = req.query;
+    const mtdFrom = date_from || `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-01`;
+    const mtdTo   = date_to   || today.toISOString().split('T')[0];
+
+    const branch = await q1(`SELECT name FROM branches WHERE id=$1`, [branchId]);
+
+    const [tdRow, tdAllRow, carsRow, consRow, modelStats, modelVariantStats, consultantStats, carKmStats, categoryStats] = await Promise.all([
+      q1(`SELECT COUNT(*)::int as c FROM test_drives WHERE branch_id=$1 AND drive_date BETWEEN $2 AND $3`, [branchId, mtdFrom, mtdTo]),
+      q1(`SELECT COUNT(*)::int as c FROM test_drives WHERE branch_id=$1`, [branchId]),
+      q1(`SELECT COUNT(*)::int as c FROM cars WHERE branch_id=$1`, [branchId]),
+      q1(`SELECT COUNT(*)::int as c FROM sales_consultants WHERE active=true AND branch_id=$1`, [branchId]),
+      q(`SELECT m.id as model_id, m.brand, m.name as model_name, COUNT(td.id)::int as td_count
+         FROM test_drives td
+         JOIN cars c ON td.car_id=c.id JOIN car_variants cv ON c.variant_id=cv.id JOIN car_models m ON cv.model_id=m.id
+         WHERE td.branch_id=$1 AND td.drive_date BETWEEN $2 AND $3
+         GROUP BY m.id, m.brand, m.name ORDER BY td_count DESC`, [branchId, mtdFrom, mtdTo]),
+      q(`SELECT m.id as model_id, cv.fuel_type, cv.transmission, COUNT(td.id)::int as td_count
+         FROM test_drives td
+         JOIN cars c ON td.car_id=c.id JOIN car_variants cv ON c.variant_id=cv.id JOIN car_models m ON cv.model_id=m.id
+         WHERE td.branch_id=$1 AND td.drive_date BETWEEN $2 AND $3
+         GROUP BY m.id, cv.fuel_type, cv.transmission ORDER BY m.id, cv.fuel_type, cv.transmission`, [branchId, mtdFrom, mtdTo]),
+      q(`SELECT sc.first_name || ' ' || sc.last_name as name, sc.employee_id, COUNT(td.id)::int as td_count
+         FROM test_drives td JOIN sales_consultants sc ON td.consultant_id=sc.id
+         WHERE td.branch_id=$1 AND td.drive_date BETWEEN $2 AND $3
+         GROUP BY sc.id, sc.first_name, sc.last_name, sc.employee_id ORDER BY td_count DESC LIMIT 20`, [branchId, mtdFrom, mtdTo]),
+      q(`SELECT c.regd_no, m.brand || ' ' || m.name as model, b.name as branch_name,
+               COUNT(td.id)::int as td_count,
+               COALESCE(SUM(td.kms_in - td.kms_out), 0)::float as total_km_used
+         FROM cars c
+         JOIN car_variants cv ON c.variant_id=cv.id JOIN car_models m ON cv.model_id=m.id JOIN branches b ON c.branch_id=b.id
+         LEFT JOIN test_drives td ON td.car_id=c.id AND td.drive_date BETWEEN $2 AND $3
+         WHERE c.branch_id=$1
+         GROUP BY c.id, c.regd_no, m.brand, m.name, b.name
+         ORDER BY total_km_used DESC, td_count DESC`, [branchId, mtdFrom, mtdTo]),
+      q(`SELECT category, COUNT(*)::int as count FROM test_drives
+         WHERE branch_id=$1 AND drive_date BETWEEN $2 AND $3
+         GROUP BY category ORDER BY count DESC`, [branchId, mtdFrom, mtdTo]),
+    ]);
+
+    res.json({
+      totalDrives: tdRow?.c || 0, totalDrivesAll: tdAllRow?.c || 0,
+      totalCars: carsRow?.c || 0, totalConsultants: consRow?.c || 0,
+      modelStats, modelVariantStats, consultantStats, carKmStats, categoryStats,
+      branchName: branch?.name || '', dateRange: { from: mtdFrom, to: mtdTo },
+    });
+  } catch (e) { console.error(e); res.status(500).json({ error: e.message }); }
+});
+
 // ── Public routes (no auth — QR form) ────────────────────────────────────────
 
 app.get('/api/public/car/:id', async (req, res) => {
