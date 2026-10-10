@@ -598,9 +598,10 @@ app.get('/api/public/consultants', async (req, res) => {
 
 app.post('/api/public/test-drive', async (req, res) => {
   const { car_id, branch_id, consultant_id, slip_id, customer_name, customer_phone, drive_date, category, activity_name, showroom_type, kms_in, kms_out, remarks } = req.body;
-  if (!car_id || !branch_id || !consultant_id || !customer_name || !customer_phone || !drive_date || !category || !showroom_type ||
-      kms_in === undefined || kms_in === null || kms_in === '' || kms_out === undefined || kms_out === null || kms_out === '')
+  if (!car_id || !branch_id || !consultant_id || !customer_name || !customer_phone || !drive_date || !category || !showroom_type)
     return res.status(400).json({ error: 'All required fields must be filled' });
+  if (category === 'Test Drive' && (kms_in === undefined || kms_in === null || kms_in === '' || kms_out === undefined || kms_out === null || kms_out === ''))
+    return res.status(400).json({ error: 'KMS Out and KMS In are required for Test Drive' });
   if (category === 'Activity' && !activity_name)
     return res.status(400).json({ error: 'Activity name is required for Activity category' });
   try {
